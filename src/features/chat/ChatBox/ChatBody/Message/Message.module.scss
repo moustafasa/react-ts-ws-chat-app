@@ -1,0 +1,33 @@
+@use "../../../../../sass/helpers/mixins" as *;
+@use "../../../../../sass/variables/colors" as *;
+
+.message {
+  &:not(.me) {
+    flex-direction: row-reverse;
+  }
+  .message-cont {
+    position: relative;
+    width: 40%;
+  }
+
+  &:not(.me) {
+    .message-cont {
+      background-color: $dark;
+      &::before {
+        content: "";
+        @include arrow(8px, 10px, "left", $dark);
+      }
+    }
+  }
+
+  &.me {
+    .message-cont {
+      background-color: $primary;
+      color: $white;
+      &::before {
+        content: "";
+        @include arrow(8px, 10px, "right", $primary);
+      }
+    }
+  }
+}

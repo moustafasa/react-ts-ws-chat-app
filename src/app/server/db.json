@@ -1,0 +1,321 @@
+{
+  "data": {
+    "users": [
+      {
+        "id": "18e63c73702",
+        "name": "Moustafa Ramadan",
+        "email": "moustafasaad954@gmail.com",
+        "roles": [
+          "USER"
+        ],
+        "password": "$2a$10$5b6jBigmtvBPjhBOMMY7eulUjPR9u2t6eypIUSejeU54XP5Nqcb.a",
+        "img": "https://placehold.jp/50x50.png",
+        "activeState": true,
+        "rooms": [
+          "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+          "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+          "039e7ae2-a09f-462c-8a2a-417b9d9a5fc5"
+        ],
+        "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE4ZTYzYzczNzAyIiwiZW1haWwiOiJtb3VzdGFmYXNhYWQ5NTRAZ21haWwuY29tIiwibmFtZSI6Ik1vdXN0YWZhIFJhbWFkYW4iLCJyb29tcyI6WyJkYzQzY2U5Ny1iYjYyLTQ4ZjEtODcyYy1hYWJhZjA1YzZlNGEiLCJlMTcyNDAxYy01YmExLTQxN2EtODZjZS1kMmFhMGEyZjE0MDciLCIwMzllN2FlMi1hMDlmLTQ2MmMtOGEyYS00MTdiOWQ5YTVmYzUiXSwiZGF0ZSI6IjE0NGJkMzdkMWUuZjc5NyIsImlhdCI6MTcxMTM2NTc3NSwiZXhwIjoxNzExNDUyMTc1fQ.xAPbFBf_kK7BGWWcT9m4rRVlWRhyXncMWMijF2r9aCs"
+      },
+      {
+        "id": "18e63c73703",
+        "name": "mahmoud",
+        "email": "mahmoud@gmail.com",
+        "roles": [
+          "USER"
+        ],
+        "password": "$2a$10$5b6jBigmtvBPjhBOMMY7eulUjPR9u2t6eypIUSejeU54XP5Nqcb.a",
+        "img": "https://placehold.jp/50x50.png",
+        "activeState": false,
+        "rooms": [
+          "7e6378c8-4e5b-4654-8c00-1e51ce3f1162",
+          "e172401c-5ba1-417a-86ce-d2aa0a2f1407"
+        ],
+        "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE4ZTYzYzczNzAzIiwiZW1haWwiOiJtYWhtb3VkQGdtYWlsLmNvbSIsIm5hbWUiOiJtYWhtb3VkIiwicm9vbXMiOlsiN2U2Mzc4YzgtNGU1Yi00NjU0LThjMDAtMWU1MWNlM2YxMTYyIiwiZTE3MjQwMWMtNWJhMS00MTdhLTg2Y2UtZDJhYTBhMmYxNDA3Il0sImRhdGUiOiJkYmE4MDI1ZTY2LjY5NDgiLCJpYXQiOjE3MTE0MDcyNzAsImV4cCI6MTcxMTQ5MzY3MH0.Nio3pY2xPay2Tmx5yPX5udt3j_gx1zzl7CUHgE-BpoE"
+      },
+      {
+        "id": "18e6d242e0b",
+        "name": "abas",
+        "email": "abas@gmail.com",
+        "password": "$2a$10$3P7Wv/iHhEwWoKl3k/rGzOtqaloDA9QjwNX9QSouH4S6Df.bqIjhy",
+        "img": "https://placehold.jp/50x50.png",
+        "activeState": false,
+        "rooms": [
+          "7e6378c8-4e5b-4654-8c00-1e51ce3f1162",
+          "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+          "06d36654-26cc-4c9c-8aa7-9eb5662ba434"
+        ],
+        "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE4ZTZkMjQyZTBiIiwiZW1haWwiOiJhYmFzQGdtYWlsLmNvbSIsIm5hbWUiOiJhYmFzIiwicm9vbXMiOlsiN2U2Mzc4YzgtNGU1Yi00NjU0LThjMDAtMWU1MWNlM2YxMTYyIiwiZGM0M2NlOTctYmI2Mi00OGYxLTg3MmMtYWFiYWYwNWM2ZTRhIiwiMDZkMzY2NTQtMjZjYy00YzljLThhYTctOWViNTY2MmJhNDM0Il0sImRhdGUiOiJhMTY0OTZlZDJjLjJjOTgiLCJpYXQiOjE3MTE0MTIzNjgsImV4cCI6MTcxMTQ5ODc2OH0.quOInkMjsTwJGIvhSUPY2wtxVdxeh9TcI86xJBkpk_g"
+      },
+      {
+        "id": "18e6d242e0234234",
+        "name": "elsaied",
+        "email": "elsaied@gmail.com",
+        "password": "$2a$10$3P7Wv/iHhEwWoKl3k/rGzOtqaloDA9QjwNX9QSouH4S6Df.bqIjhy",
+        "img": "https://placehold.jp/50x50.png",
+        "activeState": false,
+        "rooms": []
+      },
+      {
+        "id": "18e6d242e023dfsafdsafdsa",
+        "name": "sameh",
+        "email": "sameh@gmail.com",
+        "password": "$2a$10$3P7Wv/iHhEwWoKl3k/rGzOtqaloDA9QjwNX9QSouH4S6Df.bqIjhy",
+        "img": "https://placehold.jp/50x50.png",
+        "activeState": false,
+        "rooms": [
+          "039e7ae2-a09f-462c-8a2a-417b9d9a5fc5",
+          "06d36654-26cc-4c9c-8aa7-9eb5662ba434"
+        ]
+      }
+    ],
+    "chatRooms": [
+      {
+        "id": "7e6378c8-4e5b-4654-8c00-1e51ce3f1162",
+        "users": [
+          "18e6d242e0b",
+          "18e63c73703"
+        ],
+        "messages": []
+      },
+      {
+        "id": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "users": [
+          "18e63c73702",
+          "18e6d242e0b"
+        ],
+        "messages": [
+          "93e7f844-e765-4504-82cf-6b52f5ee01b0",
+          "9029c87f-7f97-4cef-b386-f3b819cd0f81",
+          "a44d5dc0-904d-4ee8-88be-6f8163bb4c2b",
+          "531cb263-b8a3-41c6-881e-d8fb9d0994ab",
+          "39200528-4b27-46d3-a4d1-ec7624034bd7",
+          "e5caf1a2-8525-4411-abba-ede3b5afac53",
+          "f13a17c7-f052-4a80-8c3d-dfc29a95f18a",
+          "541ee3af-7ba8-402a-93cc-0fa5f7938e8a",
+          "36f00024-43da-4ef5-b063-1885b975f5e0",
+          "3cbb97ea-51a6-4af5-b6ed-fa826180d296",
+          "2f1cba01-d090-4d13-a695-c750818b22c6",
+          "4e0262c4-ba9e-4270-b77a-c06691be0311",
+          "3b5bcffa-7436-4d6b-8efe-508b540f9ebf",
+          "b4e018e7-bbe0-4dd7-b6e2-cf9f922d08a8",
+          "7ba97548-d375-4fff-92dc-79f6647ece9d"
+        ]
+      },
+      {
+        "id": "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+        "users": [
+          "18e63c73702",
+          "18e63c73703"
+        ],
+        "messages": [
+          "1daa606a-ad63-4c56-84b0-f4b7879756b8",
+          "d11eb36e-9e4e-4f79-93f1-d2a3b1f9ec34",
+          "643066ec-eea9-4749-bf8f-d318526281f1",
+          "bad46b1a-4f86-42dc-850c-7762981bc175",
+          "5314c616-1fe9-4f23-a6c4-bf57c7141bb5",
+          "2643d514-e96a-4cc9-a6b9-5f8ef69934b5",
+          "db862a60-8819-4906-87bf-26c51595c05b"
+        ]
+      },
+      {
+        "id": "039e7ae2-a09f-462c-8a2a-417b9d9a5fc5",
+        "users": [
+          "18e63c73702",
+          "18e6d242e023dfsafdsafdsa"
+        ],
+        "messages": [
+          "10661097-efbf-4472-9d75-06f1af896967",
+          "8c248252-245b-48c1-bdff-60952510f416",
+          "451b9570-e928-463e-9073-4ce4b29801f4"
+        ]
+      },
+      {
+        "id": "06d36654-26cc-4c9c-8aa7-9eb5662ba434",
+        "users": [
+          "18e6d242e0b",
+          "18e6d242e023dfsafdsafdsa"
+        ],
+        "messages": []
+      }
+    ],
+    "messages": [
+      {
+        "id": "1daa606a-ad63-4c56-84b0-f4b7879756b8",
+        "room": "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+        "userId": "18e63c73702",
+        "msg": "test",
+        "timeStamp": "2024-03-25T22:48:57.238Z"
+      },
+      {
+        "id": "10661097-efbf-4472-9d75-06f1af896967",
+        "room": "039e7ae2-a09f-462c-8a2a-417b9d9a5fc5",
+        "userId": "18e63c73702",
+        "msg": "test 2",
+        "timeStamp": "2024-03-25T22:49:19.327Z"
+      },
+      {
+        "id": "8c248252-245b-48c1-bdff-60952510f416",
+        "room": "039e7ae2-a09f-462c-8a2a-417b9d9a5fc5",
+        "userId": "18e63c73702",
+        "msg": "this is message from me",
+        "timeStamp": "2024-03-25T22:49:25.030Z"
+      },
+      {
+        "id": "93e7f844-e765-4504-82cf-6b52f5ee01b0",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "this is from me",
+        "timeStamp": "2024-03-25T22:52:51.118Z"
+      },
+      {
+        "id": "9029c87f-7f97-4cef-b386-f3b819cd0f81",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e6d242e0b",
+        "msg": "how are you i am moustafa saad",
+        "timeStamp": "2024-03-25T22:53:03.766Z"
+      },
+      {
+        "id": "a44d5dc0-904d-4ee8-88be-6f8163bb4c2b",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "no i am moustafa you are abas",
+        "timeStamp": "2024-03-25T22:53:14.917Z"
+      },
+      {
+        "id": "531cb263-b8a3-41c6-881e-d8fb9d0994ab",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e6d242e0b",
+        "msg": "thankyou for this conversation",
+        "timeStamp": "2024-03-25T22:53:25.293Z"
+      },
+      {
+        "id": "39200528-4b27-46d3-a4d1-ec7624034bd7",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "you are stupid",
+        "timeStamp": "2024-03-25T22:53:36.414Z"
+      },
+      {
+        "id": "e5caf1a2-8525-4411-abba-ede3b5afac53",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e6d242e0b",
+        "msg": "you are right",
+        "timeStamp": "2024-03-25T22:53:44.614Z"
+      },
+      {
+        "id": "d11eb36e-9e4e-4f79-93f1-d2a3b1f9ec34",
+        "room": "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+        "userId": "18e63c73703",
+        "msg": "hello this is test",
+        "timeStamp": "2024-03-25T22:54:43.237Z"
+      },
+      {
+        "id": "643066ec-eea9-4749-bf8f-d318526281f1",
+        "room": "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+        "userId": "18e63c73702",
+        "msg": "test",
+        "timeStamp": "2024-03-26T00:14:31.446Z"
+      },
+      {
+        "id": "bad46b1a-4f86-42dc-850c-7762981bc175",
+        "room": "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+        "userId": "18e63c73702",
+        "msg": "this is test message",
+        "timeStamp": "2024-03-26T00:14:38.710Z"
+      },
+      {
+        "id": "451b9570-e928-463e-9073-4ce4b29801f4",
+        "room": "039e7ae2-a09f-462c-8a2a-417b9d9a5fc5",
+        "userId": "18e63c73702",
+        "msg": "hahaha",
+        "timeStamp": "2024-03-26T00:14:44.957Z"
+      },
+      {
+        "id": "f13a17c7-f052-4a80-8c3d-dfc29a95f18a",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "test",
+        "timeStamp": "2024-03-26T00:15:34.365Z"
+      },
+      {
+        "id": "5314c616-1fe9-4f23-a6c4-bf57c7141bb5",
+        "room": "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+        "userId": "18e63c73702",
+        "msg": "dsldfjsaldfa",
+        "timeStamp": "2024-03-26T00:15:43.749Z"
+      },
+      {
+        "id": "2643d514-e96a-4cc9-a6b9-5f8ef69934b5",
+        "room": "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+        "userId": "18e63c73702",
+        "msg": "hahahahaha ",
+        "timeStamp": "2024-03-26T00:18:02.365Z"
+      },
+      {
+        "id": "db862a60-8819-4906-87bf-26c51595c05b",
+        "room": "e172401c-5ba1-417a-86ce-d2aa0a2f1407",
+        "userId": "18e63c73702",
+        "msg": "emit it is is is is is is is is is is is is is is is is is is is is is is si iisiisiisis isdjf",
+        "timeStamp": "2024-03-26T00:18:35.773Z"
+      },
+      {
+        "id": "541ee3af-7ba8-402a-93cc-0fa5f7938e8a",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e6d242e0b",
+        "msg": "no no no",
+        "timeStamp": "2024-03-26T00:19:47.245Z"
+      },
+      {
+        "id": "36f00024-43da-4ef5-b063-1885b975f5e0",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e6d242e0b",
+        "msg": "hahahahahaha",
+        "timeStamp": "2024-03-26T00:19:59.356Z"
+      },
+      {
+        "id": "3cbb97ea-51a6-4af5-b6ed-fa826180d296",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "hahahahahahahahahahaha",
+        "timeStamp": "2024-03-26T00:20:06.589Z"
+      },
+      {
+        "id": "2f1cba01-d090-4d13-a695-c750818b22c6",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e6d242e0b",
+        "msg": "hohohohohoho",
+        "timeStamp": "2024-03-26T00:20:15.941Z"
+      },
+      {
+        "id": "4e0262c4-ba9e-4270-b77a-c06691be0311",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "dsfafdsafdsa",
+        "timeStamp": "2024-03-26T00:20:21.181Z"
+      },
+      {
+        "id": "3b5bcffa-7436-4d6b-8efe-508b540f9ebf",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "dd",
+        "timeStamp": "2024-03-26T00:20:23.973Z"
+      },
+      {
+        "id": "b4e018e7-bbe0-4dd7-b6e2-cf9f922d08a8",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "fdshajdsa",
+        "timeStamp": "2024-03-26T00:22:47.188Z"
+      },
+      {
+        "id": "7ba97548-d375-4fff-92dc-79f6647ece9d",
+        "room": "dc43ce97-bb62-48f1-872c-aabaf05c6e4a",
+        "userId": "18e63c73702",
+        "msg": "i am moustafa",
+        "timeStamp": "2024-03-26T00:22:50.891Z"
+      }
+    ]
+  }
+}

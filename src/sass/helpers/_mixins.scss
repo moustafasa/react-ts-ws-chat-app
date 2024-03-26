@@ -1,0 +1,234 @@
+﻿@use "sass:meta";
+@use "sass:map";
+@use "../variables/colors" as *;
+
+@mixin animation($name) {
+  @-webkit-keyframes #{$name} {
+    @content;
+  }
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+@mixin medias($size) {
+  @if ($size == "mobile") {
+    @media (max-width: 767px) {
+      @content;
+    }
+  } @else if($size== "small") {
+    @media (max-width: 991px) and (min-width: 768px) {
+      @content;
+    }
+  } @else if($size== "medium") {
+    @media (max-width: 1199px) and (min-width: 992px) {
+      @content;
+    }
+  } @else if($size== "large") {
+    @media (min-width: 1200px) {
+      @content;
+    }
+  } @else if($size == "more mobile") {
+    @media (min-width: 768px) {
+      @content;
+    }
+  } @else if($size== "more small") {
+    @media (min-width: 992px) {
+      @content;
+    }
+  } @else if($size== "less large") {
+    @media (max-width: 1199px) {
+      @content;
+    }
+  } @else if($size== "less small") {
+    @media (max-width: 991px) {
+      @content;
+    }
+  }
+}
+
+@mixin arrow($pos, $width, $dir, $color) {
+  @if ($dir == "top") {
+    position: absolute;
+    top: 0;
+    right: $pos;
+    border: $width solid {
+      color: transparent transparent $color;
+    }
+    transform: translateY(-100%);
+  } @else if ($dir == "bottom") {
+    position: absolute;
+    bottom: -$width * 2;
+    right: $pos;
+    border: $width solid {
+      color: $color transparent transparent;
+    }
+  } @else if ($dir== "right") {
+    position: absolute;
+    left: -$width * 2;
+    top: $pos;
+    border: $width solid {
+      color: transparent $color transparent transparent;
+    }
+  } @else if ($dir == "left") {
+    position: absolute;
+    right: -$width * 2;
+    top: $pos;
+    border: $width solid {
+      color: transparent transparent transparent $color;
+    }
+  } @else if($dir== "top reverse") {
+    position: absolute;
+    border: $width solid {
+      color: transparent transparent $color;
+    }
+    transform: translateY(-100%);
+    @each $key, $value in $pos {
+      #{$key}: $value;
+    }
+  }
+}
+
+@mixin centerbyflex($dir, $display: flex) {
+  display: $display;
+  @if ($dir == null) {
+    justify-content: center;
+    align-items: center;
+  } @else if($dir == "horizontal") {
+    justify-content: center;
+  } @else if($dir == "vertical") {
+    align-items: center;
+  }
+}
+
+@mixin centerbyposition($dir, $pos: null) {
+  position: $pos;
+  @if ($dir == "both") {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  } @else if($dir == "horizontal") {
+    left: 50%;
+    transform: translateX(-50%);
+  } @else if($dir == "vertical") {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+@mixin circle($dimentions) {
+  width: $dimentions;
+  height: $dimentions;
+  border-radius: 50%;
+}
+
+@mixin loopColors($list, $property) {
+  @each $class, $color in $list {
+    .#{$class} {
+      #{$property}: $color;
+    }
+  }
+}
+
+@mixin grid($min, $gap) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min, 1fr));
+  gap: $gap;
+}
+
+@mixin position(
+  $color: null,
+  $pos: null,
+  $width: null,
+  $height: null,
+  $dir...
+) {
+  position: $pos;
+  width: $width;
+  height: $height;
+  background-color: $color;
+  @each $key, $value in meta.keywords($dir) {
+    #{$key}: $value;
+  }
+}
+
+@mixin beforeBorder($color, $width, $height, $transition: null) {
+  &::before {
+    content: "";
+    @include position($color, absolute, $width, $height, $top: 0, $left: 0);
+    transition: $transition;
+  }
+}
+@mixin oneValue($selector, $prop, $value) {
+  #{$selector} {
+    #{$prop}: $value;
+  }
+}
+
+@mixin addIcon($code) {
+  content: "#{$code}";
+  font-family: "font awesome 5 free";
+}
+
+@mixin one-value-more-properties($value, $properties...) {
+  @each $property in $properties {
+    #{$property}: $value;
+  }
+}
+
+@mixin head-slide-animation($content, $color) {
+  overflow: hidden;
+  &::before,
+  &::after {
+    content: $content;
+    position: absolute;
+    top: 0;
+    transition: 0.5s;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding: inherit;
+  }
+  @include oneValue("&::after", right, 0);
+  @include oneValue("&:hover:after", right, -100%);
+  @include oneValue("&::before", left, -100%);
+  &:hover::before {
+    left: 0;
+    @if ($color !=null) {
+      color: $color;
+    }
+  }
+}
+
+@mixin flex-gap($gap, $display: flex) {
+  display: $display;
+  flex-direction: column;
+  gap: $gap;
+}
+
+@mixin addTasksBorder($gap, $class) {
+  @include medias("mobile") {
+    flex-direction: column;
+    gap: $gap;
+    .#{$class} {
+      border: 1px solid $green-2-color;
+      padding: 2rem 1rem;
+      border-radius: 0.5rem;
+      position: relative;
+      &::before {
+        content: "";
+        position: absolute;
+        width: 1px;
+        height: $gap;
+        background-color: $green-2-color;
+        inset: 0 auto auto 50%;
+        translate: -50% -100%;
+      }
+    }
+  }
+}
+
+@mixin centerbygrid() {
+  display: grid;
+  place-items: center;
+}
