@@ -10,6 +10,7 @@ import {
 } from "../../features/auth/authSlice";
 import axios from "axios";
 import { Mutex } from "async-mutex";
+import type { Dispatch, UnknownAction } from "@reduxjs/toolkit";
 
 type baseQueryArgs =
   | {
@@ -25,7 +26,9 @@ export type baseQueryError = { status: number | undefined; data: string };
 type baseQueryType<ResultType = unknown> = BaseQueryFn<
   baseQueryArgs,
   ResultType,
-  baseQueryError
+  baseQueryError,
+  unknown,
+  { dispatch: Dispatch<UnknownAction> }
 >;
 
 const axiosBaseQuery =
@@ -65,6 +68,7 @@ const axiosBaseQuery =
       // return data
       return {
         data: res.data,
+        meta: { dispatch },
       };
     } catch (axiosErr) {
       const err = axiosErr as AxiosError;

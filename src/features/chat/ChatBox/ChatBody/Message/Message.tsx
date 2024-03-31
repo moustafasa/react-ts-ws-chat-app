@@ -1,23 +1,28 @@
 import classNames from "classnames";
 import sass from "./Message.module.scss";
 import {
-  getMessageById,
   getUserById,
   useGetChatsQuery,
+  useReadMessageMutation,
 } from "../../../chatApiSlice";
 import { useAppSelector } from "../../../../../app/hooks";
 import { getCurrentUser } from "../../../../auth/authSlice";
+import { differenceInDays, formatDistance, formatRelative } from "date-fns";
+import type { MessageType } from "../../../../../models/chat";
+import { FaCheckDouble } from "react-icons/fa";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { getLastSeenTimeStamp } from "../../../chatSlice";
 
 type PropsType = {
-  id: string;
+  message: MessageType;
 };
-const Message = ({ id }: PropsType) => {
+const Message = ({ message }: PropsType) => {
   const currentUser = useAppSelector(getCurrentUser);
-  const { message, messageAuthor } = useGetChatsQuery(undefined, {
+  const { room } = useParams();
+  const { messageAuthor } = useGetChatsQuery(undefined, {
     selectFromResult: ({ data, ...rest }) => {
-      const message = getMessageById(data, id);
       return {
-        message,
         messageAuthor: getUserById(data, message.userId),
         ...rest,
       };
@@ -33,16 +38,44 @@ const Message = ({ id }: PropsType) => {
       [sass.me]: isMe,
     }
   );
+
+  const timeStamp = new Date(message.timeStamp);
+
+  const lastSeen = useAppSelector((state) =>
+    getLastSeenTimeStamp(state, room || "", message.userId)
+  );
+
   return (
     <div className={messageClass}>
       {!isMe && <img src={messageAuthor?.img} className="rounded-circle" />}
-      <div className={" px-3 py-2 rounded " + sass["message-cont"]}>
+      <div className={" ps-3 pe-2 py-2 rounded " + sass["message-cont"]}>
         {!isMe && (
           <div className="text-capitalize text-info ">
             <h6>{messageAuthor?.name}</h6>
           </div>
         )}
         <div className="text-capitalize py-1 ">{message?.msg}</div>
+        <div>
+          <div
+            className="text-body-secondary text-capitalize fw-bold d-flex justify-content-end align-items-center gap-1"
+            style={{ fontSize: "0.7rem" }}
+          >
+            <span>
+              {differenceInDays(new Date(), timeStamp) >= 1
+                ? formatRelative(timeStamp, new Date())
+                : formatDistance(timeStamp, new Date(), {
+                    addSuffix: true,
+                  })}
+            </span>
+            <FaCheckDouble
+              className={classNames({
+                "text-info":
+                  lastSeen &&
+                  timeStamp.getTime() < new Date(lastSeen).getTime(),
+              })}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

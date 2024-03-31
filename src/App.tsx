@@ -12,6 +12,9 @@ import Home from "./components/home/Home";
 import ChatPage from "./features/chat/ChatPage/ChatPage";
 import { useMemo } from "react";
 import PersistLogin from "./features/auth/PersistentLogin";
+import ChatWelcomPage from "./features/chat/ChatWelcomPage/ChatWelcomPage";
+import ChatBox from "./features/chat/ChatBox/ChatBox";
+import MessageBox from "./features/chat/MessageBox/MessageBox";
 
 const authBackLoader = (token: string) => async () => {
   if (token) {
@@ -44,7 +47,25 @@ function App() {
                   element: <Register />,
                   loader: authBackLoader(token),
                 },
-                { path: "chat/:chat?", element: <ChatPage /> },
+                {
+                  path: "chat",
+                  element: <ChatPage />,
+                  children: [
+                    {
+                      index: true,
+                      element: <ChatWelcomPage />,
+                    },
+                    {
+                      path: ":room",
+                      element: (
+                        <>
+                          <ChatBox />
+                          <MessageBox />
+                        </>
+                      ),
+                    },
+                  ],
+                },
               ],
             },
           ],

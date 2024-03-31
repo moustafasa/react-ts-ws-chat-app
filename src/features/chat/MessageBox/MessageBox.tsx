@@ -5,18 +5,20 @@ import { useParams } from "react-router-dom";
 import { WsType } from "../../../models/chat";
 
 const MessageBox = () => {
-  const { chat: room } = useParams();
+  const { room } = useParams();
   const [message, setMessage] = useState("");
   const [sendMessage] = useSendMessageMutation();
 
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    sendMessage({ type: WsType.MESSAGE, msg: message, room });
-    setMessage("");
+    if (message) {
+      sendMessage({ type: WsType.MESSAGE, msg: message, room });
+      setMessage("");
+    }
   };
 
   return (
-    <div className="border-top pt-3 pb-5 mb-3">
+    <div className="border-top py-3  mb-3" style={{ maxHeight: "100px" }}>
       <form className="d-flex gap-2" onSubmit={submitHandler}>
         <FormControl
           type="text"

@@ -30,6 +30,7 @@ server.use(
   jsonServer.rewriter({
     "data/users": "/users",
     "data/chatRooms": "/chatRooms",
+    "data/messages": "/messages",
   })
 );
 
@@ -98,6 +99,14 @@ server.get("/chats", (req, res) => {
       .filter((message) => message.room === chat.id)
       .value();
 
+    // console.log(messages);
+    messages.sort(
+      (a, b) =>
+        new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime()
+    );
+
+    // console.log(messages);
+
     const modifiedUser = {
       id: user.id,
       name: user.name,
@@ -106,10 +115,22 @@ server.get("/chats", (req, res) => {
       active: user.activeState,
     };
 
+    const lastSeenStamp = chat.lastSeen.find(
+      (seen) => seen.id === req.userId
+    ).timeStamp;
+
+    console.log(lastSeenStamp);
+
     return {
       id: chat.id,
       user: modifiedUser,
-      messages,
+      latestMessage: messages[messages.length - 1],
+      unReadMessages: messages.filter(
+        (msg) =>
+          msg.userId !== req.userId &&
+          new Date(msg.timeStamp).getTime() > new Date(lastSeenStamp).getTime()
+      ).length,
+      lastSeen: chat.lastSeen,
     };
   });
 
@@ -144,6 +165,10 @@ server.post("/chats", (req, res) => {
         id: roomId,
         users: [currentUser.id, otherUser.id],
         messages: [],
+        lastSeen: [
+          { id: currentUser.id, timeStamp: new Date().toISOString() },
+          { id: otherUser.id, timeStamp: new Date().toISOString() },
+        ],
       };
       allRooms.push(room).write();
     }
@@ -151,15 +176,25 @@ server.post("/chats", (req, res) => {
   res.sendStatus(200);
 });
 
+server.get("/messages/:chatId", (req, res) => {
+  const { chatId } = req.params;
+
+  const messagesOfChat = db
+    .get("data")
+    .get("messages")
+    .filter((message) => message.room === chatId)
+    .value();
+
+  messagesOfChat.sort(
+    (a, b) => new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime()
+  );
+
+  res.send(messagesOfChat);
+});
+
 const wss = new WebSocketServer({ noServer: true, path: "/chat" });
 
 wss.on("connection", (ws, req) => {
-  console.log("connect");
-  const roomsDb = db
-    .get("data")
-    .get("chatRooms")
-    .filter((room) => ws.rooms.includes(room.id));
-
   // make user active
   db.get("data")
     .get("users")
@@ -179,16 +214,24 @@ wss.on("connection", (ws, req) => {
       case "MESSAGE": {
         const id = uuidv4();
         const { room, userId, msg, meta } = message;
+        const chatDb = db.get("data").get("chatRooms").find({ id: room });
         // add message to db
         db.get("data")
           .get("messages")
-          .push({ id, room, userId, msg, timeStamp: meta.timeStamp })
+          .push({
+            id,
+            room,
+            userId,
+            msg,
+            timeStamp: meta.timeStamp,
+          })
           .write();
-        db.get("data")
-          .get("chatRooms")
-          .find({ id: room })
-          .get("messages")
-          .push(id)
+
+        chatDb.get("messages").push(id).write();
+        chatDb
+          .assign({
+            unReadMessages: chatDb.get("unReadMessages").value() + 1,
+          })
           .write();
 
         wss.clients.forEach((client) => {
@@ -203,6 +246,29 @@ wss.on("connection", (ws, req) => {
           }
         });
         break;
+      }
+      case "READ": {
+        const { room, userId, meta } = message;
+        db.get("data")
+          .get("chatRooms")
+          .find({ id: room })
+          .get("lastSeen")
+          .find((user) => user.id === userId)
+          .assign({ timeStamp: meta.timeStamp })
+          .write();
+
+        wss.clients.forEach((client) => {
+          if (client.rooms.find((room) => room === message.room)) {
+            client.send(
+              JSON.stringify({
+                type: message.type,
+                room,
+                userId,
+                meta,
+              })
+            );
+          }
+        });
       }
     }
   });

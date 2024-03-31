@@ -1,0 +1,8 @@
+@use "../../../../sass/variables/colors" as *;
+
+.nav-link {
+  &.active,
+  &:hover {
+    background-color: rgba($color: $primary, $alpha: 0.4);
+  }
+}

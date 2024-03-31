@@ -1,7 +1,11 @@
-import { Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { ParsedChatType } from "../../../../models/chat";
 import { getUserById, useGetChatsQuery } from "../../chatApiSlice";
+import sass from "./ChatListItem.module.scss";
+import classNames from "classnames";
+import { useAppSelector } from "../../../../app/hooks";
+import { getRoomMetaDataById } from "../../chatSlice";
+import { Badge } from "react-bootstrap";
 
 type PropsType = { chat: ParsedChatType };
 
@@ -12,11 +16,22 @@ const ChatListItem = ({ chat }: PropsType) => {
       ...rest,
     }),
   });
+  const roomMeta = useAppSelector((state) =>
+    getRoomMetaDataById(state, chat.id)
+  );
+
   return (
-    <Nav.Link
-      as={NavLink}
+    <NavLink
       to={`/chat/${chat.id}`}
-      className="text-capitalize text-left d-flex gap-2 w-100 text-white"
+      className={({ isActive }) => {
+        return classNames(
+          "text-capitalize nav-link text-left d-flex gap-2 w-100 text-white",
+          sass["nav-link"],
+          {
+            [sass.active]: isActive,
+          }
+        );
+      }}
     >
       <img src={user.img} className="rounded-circle" />
       <div
@@ -40,19 +55,23 @@ const ChatListItem = ({ chat }: PropsType) => {
             ></span>
           )}
         </div>
-        <p
-          className=" m-0 rounded flex-grow-1"
-          style={{
-            fontSize: "0.9rem",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          no messages yet
-          {/* {chat.latestMessage || "no messages yet"} */}
-        </p>
+        <div className="d-flex align-items-center gap-3 pe-2">
+          <p
+            className=" m-0 rounded flex-grow-1 text-info"
+            style={{
+              fontSize: "0.9rem",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {roomMeta.latestMessage?.msg || "no messages yet"}
+          </p>
+          {roomMeta.unReadMessages > 0 && (
+            <Badge bg="danger">{roomMeta.unReadMessages}</Badge>
+          )}
+        </div>
       </div>
-    </Nav.Link>
+    </NavLink>
   );
 };
 

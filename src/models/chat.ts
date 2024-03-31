@@ -4,6 +4,7 @@ export enum WsType {
   "JOIN" = "JOIN",
   "LEAVE" = "LEAVE",
   "MESSAGE" = "MESSAGE",
+  "READ" = "READ",
 }
 
 export const userSchema = z.object({
@@ -23,13 +24,26 @@ export const messageSchema = z.object({
   timeStamp: z.coerce.string(),
 });
 
-export const messagesFromChatSchema = z
-  .array(z.object({ messages: z.array(messageSchema) }))
-  .transform((chats) => chats.map((chat) => chat.messages).flat());
-
 const chatSchema = z.object({
   id: z.coerce.string(),
   user: userSchema.transform((user) => user.id),
+});
+
+export const latestMessagesSchema = z.object({
+  id: z.coerce.string(),
+  latestMessage: messageSchema.or(z.undefined()),
+  unReadMessages: z.coerce.number(),
+  lastSeen: z.array(
+    z.object({ id: z.coerce.string(), timeStamp: z.coerce.string() })
+  ),
+});
+
+export const MessagesMetaSchema = z.object({
+  id: z.coerce.string(),
+  read: z.coerce.boolean(),
+  room: z.coerce.string(),
+  timeStamp: z.coerce.string(),
+  userId: z.coerce.string(),
 });
 
 const wsMessageSchema = z.object({
@@ -39,8 +53,8 @@ const wsMessageSchema = z.object({
   msg: z.string().optional(),
   meta: z
     .object({
-      id: z.coerce.string(),
-      timeStamp: z.coerce.string(),
+      id: z.coerce.string().optional(),
+      timeStamp: z.coerce.string().optional(),
     })
     .optional(),
 });
@@ -64,12 +78,16 @@ export const MessageFromWsMessageScheme = wsMessageSchema.transform(
   }
 );
 
+export const arrayOfMessageSchema = z.array(messageSchema);
+
 export const arrayOfChatSchema = z.array(chatSchema);
+export const arrayOfLatestMessageSchema = z.array(latestMessagesSchema);
+export const arrayOfMessageMetaSchema = z.array(MessagesMetaSchema);
 
 export type ParsedChatType = z.infer<typeof chatSchema>;
 export type unParsedChatType = Omit<ParsedChatType, "user"> & {
-  messages: MessageType[];
   user: ChatUserType;
+  latestMessage: MessageType | undefined;
 };
 
 export type WsMessage = z.infer<typeof wsMessageSchema>;
@@ -77,3 +95,5 @@ export type WsMessage = z.infer<typeof wsMessageSchema>;
 export type MessageType = z.infer<typeof messageSchema>;
 
 export type ChatUserType = z.infer<typeof userSchema>;
+export type LatestMessagesType = z.infer<typeof latestMessagesSchema>;
+export type MessagesMetaType = z.infer<typeof MessagesMetaSchema>;
