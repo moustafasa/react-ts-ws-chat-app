@@ -20,6 +20,7 @@ const authSlice = createSlice({
     },
     logout(state) {
       state.token = "";
+      state.user = "";
     },
   },
 });

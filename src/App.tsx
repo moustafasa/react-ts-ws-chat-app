@@ -6,7 +6,7 @@ import {
 import LayOut from "./components/layout/LayOut";
 import Login from "./features/auth/Login/Login";
 import Register from "./features/auth/Register/Register";
-import { useAppSelector } from "./app/hooks";
+import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { getToken } from "./features/auth/authSlice";
 import Home from "./components/home/Home";
 import ChatPage from "./features/chat/ChatPage/ChatPage";
@@ -15,6 +15,7 @@ import PersistLogin from "./features/auth/PersistentLogin";
 import ChatWelcomPage from "./features/chat/ChatWelcomPage/ChatWelcomPage";
 import ChatBox from "./features/chat/ChatBox/ChatBox";
 import MessageBox from "./features/chat/MessageBox/MessageBox";
+import { action as logoutAction } from "./features/auth/LogOut";
 
 const authBackLoader = (token: string) => async () => {
   if (token) {
@@ -25,6 +26,7 @@ const authBackLoader = (token: string) => async () => {
 
 function App() {
   const token = useAppSelector(getToken);
+  const dispatch = useAppDispatch();
 
   const router = useMemo(
     () =>
@@ -66,12 +68,13 @@ function App() {
                     },
                   ],
                 },
+                { path: "/logout", action: logoutAction(dispatch) },
               ],
             },
           ],
         },
       ]),
-    [token]
+    [token, dispatch]
   );
   return (
     <div>

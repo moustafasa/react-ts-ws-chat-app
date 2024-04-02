@@ -27,9 +27,12 @@ const NavBar = () => {
                 </Link>
               </>
             ) : (
-              <Link to={"/chat"} className="nav-link">
-                chat
-              </Link>
+              <>
+                <Link to={"/chat"} className="nav-link">
+                  chat
+                </Link>
+                <button className="nav-link">logout</button>
+              </>
             )}
           </Nav>
         </Navbar.Collapse>

@@ -1,6 +1,6 @@
 import { apiSlice } from "../../app/api/apiSlice";
 import type { LoginType, RegisterType } from "../../models/auth";
-import { setCredentials, type setCredentialsArgs } from "./authSlice";
+import { logout, setCredentials, type setCredentialsArgs } from "./authSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -40,6 +40,17 @@ export const authApiSlice = apiSlice.injectEndpoints({
         try {
           const res = await queryFulfilled;
           dispatch(setCredentials(res.data));
+        } catch (err) {
+          console.log(err);
+        }
+      },
+    }),
+    logout: builder.mutation<void, void>({
+      query: () => "/logout",
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(logout());
         } catch (err) {
           console.log(err);
         }
