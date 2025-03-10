@@ -5,12 +5,7 @@ import bcrypt from "bcryptjs";
 // Define some constants
 const ACESS_SECRET_KEY = `access-secret-key`; // The secret key for signing jwt tokens
 const REFRESH_SECRET_KEY = "refresh-secret-key";
-const SALT_ROUNDS = 10; // The number of salt rounds for hashing passwords
-const allowedHosts = [
-  "http://localhost:3001",
-  "http://localhost:5173",
-  "http://localhost:3002",
-];
+
 // const bcrypt = require("bcryptjs");
 
 // A helper function to create a token from a payload
@@ -40,41 +35,6 @@ const verifyToken = (token, type) => {
     type === "access" ? ACESS_SECRET_KEY : REFRESH_SECRET_KEY,
     (err, decode) => (decode !== undefined ? decode : err)
   );
-};
-
-// Create a middleware function that checks the request origin
-export const checkOrigin = (req, res, next) => {
-  // Get the origin from the request headers
-  const origin = req.headers.origin;
-  // If the origin is in the allowed hosts, proceed to the next middleware
-  if (allowedHosts.includes(origin)) {
-    next();
-  } else {
-    // Otherwise, send a 403 forbidden response
-    res.status(403).send("Access denied");
-  }
-};
-
-export const hashPassword = (req, res, next) => {
-  if (
-    ["POST", "PUT"].includes(req.method) &&
-    req.path !== "/login" &&
-    req.body.password
-  ) {
-    // Hash the password with bcrypt
-    bcrypt.hash(req.body.password, SALT_ROUNDS, (err, hash) => {
-      if (err) {
-        // Handle hashing error
-        res.status(500).send(err.message);
-      } else {
-        // Replace the plain password with the hashed one
-        req.body.password = hash;
-        next();
-      }
-    });
-  } else {
-    next();
-  }
 };
 
 export const register = (db) => (req, res) => {
@@ -222,39 +182,5 @@ export const authenticate = (token, onSuccess, onFail) => {
     onSuccess(decoded);
   } else {
     onFail();
-  }
-};
-
-// A middleware to check the authorization header for a valid token
-export const checkAuth = (req, res, next) => {
-  // Get the authorization header from the request
-  const authorization = req.headers.authorization || req.headers.Authorization;
-  if (req.path !== "/refresh") {
-    // Check if the authorization header is present and has the format 'Bearer token'
-    if (authorization && authorization.split(" ")[0] === "Bearer") {
-      // Get the token from the authorization header
-      const token = authorization.split(" ")[1];
-
-      // on error success
-      const onSuccess = (decoded) => {
-        // Token is valid, set the user id  in the request object
-        req.userId = decoded.id;
-        next();
-      };
-
-      // on error fail
-      const onFail = () => {
-        // Token is invalid, return a 401 Unauthorized response
-        res.status(401).send("Invalid token");
-      };
-
-      // authenticate
-      authenticate(token, onSuccess, onFail);
-    } else {
-      // Authorization header is not present or has a wrong format, return a 401 Unauthorized response
-      res.status(401).send("Authorization header required");
-    }
-  } else {
-    next();
   }
 };

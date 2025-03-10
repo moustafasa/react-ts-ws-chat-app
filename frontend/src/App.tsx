@@ -10,7 +10,6 @@ import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { getToken } from "./features/auth/authSlice";
 import Home from "./components/home/Home";
 import ChatPage from "./features/chat/ChatPage/ChatPage";
-import { useMemo } from "react";
 import PersistLogin from "./features/auth/PersistentLogin";
 import ChatWelcomPage from "./features/chat/ChatWelcomPage/ChatWelcomPage";
 import ChatBox from "./features/chat/ChatBox/ChatBox";
@@ -19,7 +18,13 @@ import { action as logoutAction } from "./features/auth/LogOut";
 
 const authBackLoader = (token: string) => async () => {
   if (token) {
-    return redirect("/");
+    return redirect("/chat");
+  }
+  return null;
+};
+const protectLoader = (token: string | undefined) => async () => {
+  if (!token) {
+    return redirect("/login");
   }
   return null;
 };
@@ -28,54 +33,51 @@ function App() {
   const token = useAppSelector(getToken);
   const dispatch = useAppDispatch();
 
-  const router = useMemo(
-    () =>
-      createBrowserRouter([
+  const router = createBrowserRouter([
+    {
+      element: <PersistLogin />,
+      children: [
         {
-          element: <PersistLogin />,
+          path: "/",
+          element: <LayOut />,
           children: [
+            { index: true, element: <Home /> },
             {
-              path: "/",
-              element: <LayOut />,
-              children: [
-                { index: true, element: <Home /> },
-                {
-                  path: "login",
-                  element: <Login />,
-                  loader: authBackLoader(token),
-                },
-                {
-                  path: "register",
-                  element: <Register />,
-                  loader: authBackLoader(token),
-                },
-                {
-                  path: "chat",
-                  element: <ChatPage />,
-                  children: [
-                    {
-                      index: true,
-                      element: <ChatWelcomPage />,
-                    },
-                    {
-                      path: ":room",
-                      element: (
-                        <>
-                          <ChatBox />
-                          <MessageBox />
-                        </>
-                      ),
-                    },
-                  ],
-                },
-                { path: "/logout", action: logoutAction(dispatch) },
-              ],
+              path: "login",
+              element: <Login />,
+              loader: authBackLoader(token),
             },
+            {
+              path: "register",
+              element: <Register />,
+              loader: authBackLoader(token),
+            },
+            {
+              path: "chat",
+              element: <ChatPage />,
+              children: [
+                {
+                  index: true,
+                  element: <ChatWelcomPage />,
+                },
+                {
+                  path: ":room",
+                  element: (
+                    <>
+                      <ChatBox />
+                      <MessageBox />
+                    </>
+                  ),
+                },
+              ],
+              loader: protectLoader(token),
+            },
+            { path: "/logout", loader: logoutAction(dispatch) },
           ],
         },
-      ]),
-    [token, dispatch]
-  );
+      ],
+    },
+  ]);
   return (
     <div>
       <RouterProvider router={router} />

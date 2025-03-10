@@ -1,10 +1,12 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Form, Link, useNavigation } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { getToken } from "../../features/auth/authSlice";
 
 const NavBar = () => {
   const token = useAppSelector(getToken);
+  const navig = useNavigation();
+
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
@@ -31,7 +33,10 @@ const NavBar = () => {
                 <Link to={"/chat"} className="nav-link">
                   chat
                 </Link>
-                <button className="nav-link">logout</button>
+
+                <Link to="/logout" className="nav-link">
+                  logout
+                </Link>
               </>
             )}
           </Nav>

@@ -1,13 +1,5 @@
-import {
-  checkOrigin,
-  hashPassword,
-  register,
-  login,
-  refresh,
-  logout,
-  checkAuth,
-  authenticate,
-} from "./auth/auth.js";
+import { authenticate } from "./controllers/authControllers.js";
+import process from "node:process";
 import jsonServer from "json-server";
 import cookieParser from "cookie-parser";
 import { WebSocketServer } from "ws";
@@ -15,13 +7,16 @@ import { createServer } from "http";
 import express from "express";
 import {
   activateUser,
-  createChat,
-  getChats,
-  getMessages,
   socketClose,
   upgradeUrl,
-} from "./chat/chat.js";
-import { onMessage, onRead } from "./chat/wsMessages.js";
+} from "./controllers/chatControllers.js";
+import { onMessage, onRead } from "./controllers/wsMessages.js";
+import { Mongoose } from "mongoose";
+import authRouter from "./routes/auth.js";
+import chatRouter from "./routes/chat.js";
+import { checkAuth } from "./middlewares/checkAuth.js";
+import { checkOrigin } from "./middlewares/checkOrigin.js";
+import { hashPassword } from "./middlewares/hashPassword.js";
 
 const server = express();
 const app = createServer(server);
@@ -29,6 +24,8 @@ const router = jsonServer.router("src/app/server/db.json");
 const middlewares = jsonServer.defaults();
 const port = import.meta.PORT || 3000;
 const db = router.db;
+
+new Mongoose().connect(process.env.DB_URI);
 
 server.use(middlewares);
 // A middleware to hash the password before saving a new user
@@ -42,50 +39,20 @@ server.use(
   })
 );
 
-// server.ws("/api", (ws) => {
-//   ws.on("message", (data) => {
-//     console.log(data);
-//     ws.send("message");
-//   });
-// });
-
 // Use the middleware function before the router
 server.use(checkOrigin);
 server.use(hashPassword);
 
-// A middleware to handle user registration
-server.post("/register", register(db));
-
-// A middleware to handle user login
-server.post("/login", login(db));
-
-// A middleware to handle token refresh
-server.get("/refresh", refresh(db));
-
-server.get("/logout", logout(db));
+server.use(authRouter);
 
 // Apply the checkAuth middleware to all routes
 server.use(checkAuth);
-
-// server.get("/users/:id", (req, res) => {
-//   const { id } = req.params;
-//   const user = db.get("data").get("users").find({ id }).value();
-//   if (user) {
-//     res.status(201).send(JSON.stringify(user));
-//   } else {
-//     res.status(404).send("user not found");
-//   }
-// });
 
 //////////////////////////////////////////
 /////////////// chats ////////////////////
 //////////////////////////////////////////
 
-server.get("/chats", getChats(db));
-
-server.post("/chats", createChat(db));
-
-server.get("/messages/:chatId", getMessages(db));
+server.use(chatRouter);
 
 const wss = new WebSocketServer({ noServer: true, path: "/chat" });
 

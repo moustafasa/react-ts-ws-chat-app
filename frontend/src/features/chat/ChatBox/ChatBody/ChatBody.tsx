@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import Message from "./Message/Message";
-// import { getMessagesIdsOfRoom, useGetChatsQuery } from "../../chatApiSlice";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import {
   getAllMessages,
   useGetMessagesQuery,

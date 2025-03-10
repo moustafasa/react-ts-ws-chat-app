@@ -17,7 +17,6 @@ import {
   MessageType,
   arrayOfMessageSchema,
   arrayOfLatestMessageSchema,
-  arrayOfMessageMetaSchema,
 } from "../../models/chat";
 import type { RootState } from "../../app/store";
 import { getCurrentUser, getToken } from "../auth/authSlice";
@@ -45,17 +44,9 @@ const chatsState = chatsAdapter.getInitialState();
 let socket: WebSocket | null;
 
 const getSocket = (token: string) => {
-  if (!socket) {
+  if (!socket || socket.readyState === socket.CLOSED) {
     socket = new WebSocket(`ws://localhost:3000/chat?token=${token}`);
-
-    socket.onclose = () => {
-      // const timeout = setTimeout(() => {
-      //   getSocket(token);
-      //   clearTimeout(timeout);
-      // }, 1000);
-    };
   }
-
   return socket;
 };
 
@@ -83,12 +74,13 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         }
       ) {
         const token = getToken(getState() as RootState);
-        const ws = getSocket(token);
+        getSocket(token);
+        const ws = socket as WebSocket;
+
         try {
           await cacheDataLoaded;
           const onMessageListener = (e: MessageEvent) => {
             const message = wsMessageFromJsonSchema.parse(e.data);
-
             switch (message.type) {
               case WsType.MESSAGE: {
                 updateCachedData((draft) => {
@@ -107,7 +99,6 @@ export const chatApiSlice = apiSlice.injectEndpoints({
                   getState() as RootState,
                   message?.room || ""
                 );
-                const currentUser = getCurrentUser(getState() as RootState);
 
                 const newLastSeen = oldLastSeen.map((obj) =>
                   obj.id === message.userId
@@ -135,6 +126,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
           //it is handled by rtk query
         }
         await cacheEntryRemoved;
+        // ws.close();
       },
       keepUnusedDataFor: 0,
     }),
@@ -147,7 +139,6 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const parsedChat = arrayOfChatSchema.parse(chats);
         const latestMessage = arrayOfLatestMessageSchema.parse(chats);
         if (meta?.dispatch) {
-          console.log(latestMessage);
           meta.dispatch(setLatestMessage(latestMessage));
         }
 
@@ -227,6 +218,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const token = getToken(getState() as RootState);
         const userId = getCurrentUser(getState() as RootState);
         const ws = getSocket(token);
+
         if (ws.readyState === ws.OPEN) {
           ws.send(
             JSON.stringify({
@@ -330,7 +322,8 @@ export const {
   (state) => state || messagesState
 );
 
-// export const getLatestMessageOfRoom = createSelector(
-//   [getChatById],
-//   (chat) => chat.latestMessage
-// );
+window.addEventListener("beforeunload", () => {
+  if (socket) {
+    socket.close();
+  }
+});

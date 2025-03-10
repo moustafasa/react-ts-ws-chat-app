@@ -46,8 +46,6 @@ export const getChats = (db) => (req, res) => {
       (seen) => seen.id === req.userId
     ).timeStamp;
 
-    console.log(lastSeenStamp);
-
     return {
       id: chat.id,
       user: modifiedUser,
