@@ -18,7 +18,7 @@ const ChatBox = () => {
         className="d-flex  border-bottom p-4 align-items-center gap-3 text-capitalize fw-bold fs-5 "
       >
         <img
-          src={user?.img}
+          src={user?.img || "https://placehold.co/50"}
           width={70}
           height={70}
           className="rounded-circle"

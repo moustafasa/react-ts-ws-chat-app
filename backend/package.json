@@ -8,13 +8,14 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node --watch server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "json-server": "^1.0.0-beta.3",
+    "json-server": "^0.17.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "uuid": "^11.1.0",

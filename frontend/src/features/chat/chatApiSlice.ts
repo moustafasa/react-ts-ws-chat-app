@@ -63,6 +63,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const parsedMessages = arrayOfMessageSchema.parse(messages);
         return messagesAdapter.setAll(messagesState, parsedMessages);
       },
+      providesTags: ["Messages"],
       async onCacheEntryAdded(
         chatId,
         {
@@ -101,9 +102,9 @@ export const chatApiSlice = apiSlice.injectEndpoints({
                 );
 
                 const newLastSeen = oldLastSeen.map((obj) =>
-                  obj.id === message.userId
+                  obj.userId === message.userId
                     ? {
-                        id: obj.id,
+                        userId: obj.userId,
                         timeStamp: message.meta?.timeStamp || "",
                       }
                     : obj
@@ -218,6 +219,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const token = getToken(getState() as RootState);
         const userId = getCurrentUser(getState() as RootState);
         const ws = getSocket(token);
+        console.log(ws);
 
         if (ws.readyState === ws.OPEN) {
           ws.send(
@@ -246,7 +248,6 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const token = getToken(getState() as RootState);
         const userId = getCurrentUser(getState() as RootState);
         const ws = getSocket(token);
-
         if (ws.readyState === ws.OPEN) {
           dispatch(resetUnReadMessage(id));
 
@@ -280,7 +281,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         method: "post",
         data: { email },
       }),
-      invalidatesTags: [{ type: "Chats", id: "List" }],
+      invalidatesTags: [{ type: "Chats", id: "List" }, "Messages"],
     }),
   }),
 });

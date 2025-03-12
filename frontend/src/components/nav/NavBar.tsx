@@ -1,11 +1,29 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
-import { Form, Link, useNavigation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { getToken } from "../../features/auth/authSlice";
+import { useEffect, useRef } from "react";
 
 const NavBar = () => {
   const token = useAppSelector(getToken);
-  const navig = useNavigation();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const hideOnBlur = (e: MouseEvent) => {
+      const element = e.target as HTMLElement | null;
+      if (
+        !element?.closest("#basic-navbar-nav") &&
+        !element?.closest(".navbar-toggler") &&
+        !buttonRef.current?.classList.contains("collapsed")
+      ) {
+        buttonRef.current?.click();
+      }
+    };
+    document.addEventListener("click", hideOnBlur);
+    return () => {
+      document.removeEventListener("click", hideOnBlur);
+    };
+  }, []);
 
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
@@ -13,8 +31,8 @@ const NavBar = () => {
         <Link to={"/"} className="text-capitalize navbar-brand">
           chat app
         </Link>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
+        <Navbar.Toggle aria-controls="basic-navbar-nav" ref={buttonRef} />
+        <Navbar.Collapse id="basic-navbar-nav" className="collapse">
           <Nav className="ms-auto text-capitalize ">
             <Link to={"/"} className="nav-link">
               home

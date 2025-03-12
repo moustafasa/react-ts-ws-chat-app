@@ -1,20 +1,15 @@
 import express from "express";
-import jsonServer from "json-server";
 import {
   getChats,
   createChat,
   getMessages,
 } from "../controllers/chatControllers.js";
 
-const dbRouter = jsonServer.router("src/app/server/db.json");
-
-const db = dbRouter.db;
-
 const router = express.Router();
-router.get("/chats", getChats(db));
+router.get("/chats", getChats);
 
-router.post("/chats", createChat(db));
+router.post("/chats", createChat);
 
-router.get("/messages/:chatId", getMessages(db));
+router.get("/messages/:chatId", getMessages);
 
 export default router;

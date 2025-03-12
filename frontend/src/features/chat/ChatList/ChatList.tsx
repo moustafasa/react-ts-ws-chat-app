@@ -12,7 +12,7 @@ const ChatList = () => {
   });
 
   return (
-    <div className={"col-3 border-end pt-4 " + sass["chat-list"]}>
+    <div className={"col-md-3 col border-md-end pt-4 " + sass["chat-list"]}>
       <ChatListHeader />
       <Nav variant="pills" className="flex-column gap-4 pt-4 ">
         {chats.map((chat) => (

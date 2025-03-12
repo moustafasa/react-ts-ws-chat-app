@@ -1,16 +1,11 @@
 import classNames from "classnames";
 import sass from "./Message.module.scss";
-import {
-  getUserById,
-  useGetChatsQuery,
-  useReadMessageMutation,
-} from "../../../chatApiSlice";
+import { getUserById, useGetChatsQuery } from "../../../chatApiSlice";
 import { useAppSelector } from "../../../../../app/hooks";
 import { getCurrentUser } from "../../../../auth/authSlice";
 import { differenceInDays, formatDistance, formatRelative } from "date-fns";
 import type { MessageType } from "../../../../../models/chat";
 import { FaCheckDouble } from "react-icons/fa";
-import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getLastSeenTimeStamp } from "../../../chatSlice";
 

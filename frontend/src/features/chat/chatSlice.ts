@@ -75,11 +75,13 @@ export const { selectById: getRoomMetaDataById } =
 
 export const getLastSeenArr = createSelector(
   getRoomMetaDataById,
-  (room) => room.lastSeen
+
+  (room) => room?.lastSeen
 );
 export const getLastSeenTimeStamp = createSelector(
   [getLastSeenArr, (state, room, userId) => userId],
-  (lastSeen, userId) => lastSeen.find((user) => user.id !== userId)?.timeStamp
+  (lastSeen, userId) =>
+    lastSeen?.find((user) => user.userId !== userId)?.timeStamp
 );
 
 export const getUnReadNumber = createSelector(

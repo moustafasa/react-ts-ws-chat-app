@@ -1,24 +1,22 @@
-import { Model, models, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
 const roomSchema = new Schema({
   users: { type: [String], ref: "User" },
   messages: [
-    {
-      type: {
-        userId: { type: [String], ref: "User" },
-        msg: String,
-      },
-      timestamps: true,
-    },
+    new Schema({
+      userId: { type: [String], ref: "User" },
+      msg: String,
+      timeStamp: Date,
+    }),
   ],
   lastSeen: [
     {
       type: {
         userId: { type: String, ref: "User" },
+        timeStamp: Date,
       },
-      timestamps: true,
     },
   ],
 });
 
-export default models.Rooms || new Model("Room", roomSchema);
+export default model("Room", roomSchema);

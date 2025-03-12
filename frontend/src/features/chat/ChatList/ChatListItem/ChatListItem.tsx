@@ -33,7 +33,10 @@ const ChatListItem = ({ chat }: PropsType) => {
         );
       }}
     >
-      <img src={user.img} className="rounded-circle" />
+      <img
+        src={user.img || "https://placehold.co/50"}
+        className="rounded-circle"
+      />
       <div
         className="d-flex flex-column gap-1 justify-content-center flex-grow-1"
         style={{ overflow: "hidden", whiteSpace: "nowrap" }}

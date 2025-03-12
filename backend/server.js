@@ -1,5 +1,4 @@
 import { authenticate } from "./controllers/authControllers.js";
-import process from "node:process";
 import jsonServer from "json-server";
 import cookieParser from "cookie-parser";
 import { WebSocketServer } from "ws";
@@ -7,25 +6,29 @@ import { createServer } from "http";
 import express from "express";
 import {
   activateUser,
+  getUserRooms,
+  onMessage,
+  onRead,
   socketClose,
   upgradeUrl,
-} from "./controllers/chatControllers.js";
-import { onMessage, onRead } from "./controllers/wsMessages.js";
+} from "./controllers/wsMessages.js";
 import { Mongoose } from "mongoose";
 import authRouter from "./routes/auth.js";
 import chatRouter from "./routes/chat.js";
 import { checkAuth } from "./middlewares/checkAuth.js";
 import { checkOrigin } from "./middlewares/checkOrigin.js";
 import { hashPassword } from "./middlewares/hashPassword.js";
+import { configDotenv } from "dotenv";
+import dbConnect from "./config/dbConnect.js";
 
+configDotenv();
 const server = express();
 const app = createServer(server);
-const router = jsonServer.router("src/app/server/db.json");
+const router = jsonServer.router("/db.json");
 const middlewares = jsonServer.defaults();
 const port = import.meta.PORT || 3000;
 const db = router.db;
-
-new Mongoose().connect(process.env.DB_URI);
+dbConnect();
 
 server.use(middlewares);
 // A middleware to hash the password before saving a new user
@@ -56,24 +59,24 @@ server.use(chatRouter);
 
 const wss = new WebSocketServer({ noServer: true, path: "/chat" });
 
-wss.on("connection", (ws) => {
-  activateUser(db, wss, ws);
-
+wss.on("connection", async (ws) => {
+  await getUserRooms(ws);
+  activateUser(wss, ws);
   ws.on("message", (data) => {
     const message = JSON.parse(data.toString());
     switch (message.type) {
       case "MESSAGE": {
-        onMessage(db, message, wss, ws);
+        onMessage(message, wss, ws);
         break;
       }
       case "READ": {
-        onRead(db, wss, message);
+        onRead(wss, message);
         break;
       }
     }
   });
 
-  ws.on("close", socketClose(db, wss, ws));
+  ws.on("close", socketClose(wss, ws));
 });
 
 app.on("upgrade", upgradeUrl(wss, authenticate));

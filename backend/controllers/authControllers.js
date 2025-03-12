@@ -1,6 +1,6 @@
-// const jwt = require("jsonwebtoken");
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import Users from "../models/Users.js";
 
 // Define some constants
 const ACESS_SECRET_KEY = `access-secret-key`; // The secret key for signing jwt tokens
@@ -18,14 +18,12 @@ const createToken = (data, type) => {
   }
 };
 
-const setRefreshToken = (payload, res, db) => {
+const setRefreshToken = async (payload, res) => {
   const refresh = createToken(payload, "refresh");
   res.cookie("refreshToken", refresh, { httpOnly: true });
-  db.get("data")
-    .get("users")
-    .find({ id: payload.id })
-    .assign({ refresh })
-    .write();
+  const user = await Users.findOne({ email: payload.email });
+  user.refresh = refresh;
+  await user.save();
 };
 
 // A helper function to verify a token and get the decoded data
@@ -37,16 +35,12 @@ const verifyToken = (token, type) => {
   );
 };
 
-export const register = (db) => (req, res) => {
+export const register = async (req, res) => {
   // Get the user data from the request body
   const { name, email, password } = req.body;
 
   // Check if the username is already taken
-  const existingUser = db
-    .get("data")
-    .get("users")
-    .find({ email: email.toLowerCase() })
-    .value();
+  const existingUser = await Users.findOne({ email: email.toLowerCase() });
 
   if (existingUser) {
     // Return a 409 Conflict response
@@ -54,55 +48,48 @@ export const register = (db) => (req, res) => {
   } else {
     // Create a new user record
     const payload = {
-      id: new Date().getTime().toString(16),
       name,
       email: email.toLowerCase(),
-      rooms: [],
     };
-    db.get("data")
-      .get("users")
-      .push({ ...payload, name, password, active: false, img: "string" })
-      .write();
+    const user = await Users.create({ ...payload, password });
+    payload.id = user._id.toString();
 
     // Create a token for the new user
     const token = createToken(payload, "access");
+    req.userId = payload.id;
 
-    setRefreshToken(payload, res, db);
+    await setRefreshToken(payload, res);
 
     // Return a 201 Created response with the token
     res.status(201).json({ token });
   }
 };
 
-export const login = (db) => (req, res) => {
+export const login = async (req, res) => {
   // Get the credentials from the request body
   const { email, password } = req.body;
 
   // Find the user by username
-  const user = db
-    .get("data")
-    .get("users")
-    .find({ email: email.toLowerCase() })
-    .value();
+  const user = await Users.findOne({ email: email.toLowerCase() });
 
   if (user) {
     // Compare the password with the hashed one
-    bcrypt.compare(password, user.password, (err, result) => {
+    bcrypt.compare(password, user.password, async (err, result) => {
       if (err) {
         // Handle comparison error
         res.status(500).send(err.message);
       } else {
         if (result) {
           const payload = {
-            id: user.id,
+            id: user._id.toString(),
             email: email.toLowerCase(),
             name: user.name,
-            rooms: user.rooms,
           };
           // Passwords match, create a token for the user
           const token = createToken(payload, "access");
           // set refresh token in database and coockie
-          setRefreshToken(payload, res, db);
+          await setRefreshToken(payload, res);
+          req.userId = payload.id;
           // Return a 200 OK response with the token
           res.status(200).json({ token });
         } else {
@@ -117,7 +104,7 @@ export const login = (db) => (req, res) => {
   }
 };
 
-export const refresh = (db) => (req, res) => {
+export const refresh = async (req, res) => {
   // Get the refresh token from the cookie
   const refreshToken = req.cookies.refreshToken;
 
@@ -127,7 +114,7 @@ export const refresh = (db) => (req, res) => {
   // Check if the refresh token is valid and not expired
   if (decoded && !decoded.message) {
     // Find the user by id
-    const user = db.get("data").get("users").find({ id: decoded.id }).value();
+    const user = await Users.findOne({ email: decoded.email.toLowerCase() });
 
     // Check if the refresh token matches the one in the database
     if (user && user.refresh === refreshToken) {
@@ -137,7 +124,6 @@ export const refresh = (db) => (req, res) => {
           id: user.id,
           email: user.email,
           name: user.name,
-          rooms: user.rooms,
         },
         "access"
       );
@@ -147,28 +133,34 @@ export const refresh = (db) => (req, res) => {
       // Return a 200 OK response with the new access token
       res.status(200).json({ token });
     } else {
+      res.clearCookie("refreshToken", { httpOnly: true });
+      user.refresh = undefined;
+      await user.save();
+
       // Refresh token does not match, return a 401 Unauthorized response
       res.status(401).send("Invalid refresh token");
     }
   } else {
+    res.clearCookie("refreshToken", { httpOnly: true });
     // Refresh token is invalid or expired, return a 401 Unauthorized response
     res.status(401).send("Invalid refresh token");
   }
 };
 
-export const logout = (db) => (req, res) => {
+export const logout = async (req, res) => {
   const refresh = req.cookies.refreshToken;
+  req.userId = undefined;
+
   if (!refresh) {
     res.status(204);
   } else {
     res.clearCookie("refreshToken", { httpOnly: true });
-    const user = db.get("data").get("users").find({ refresh });
-    if (!user.value()) {
+    const user = await Users.findOne({ refresh }, "refresh");
+    if (!user.refresh) {
       res.sendStatus(204);
     } else {
-      const userValue = user.value();
-      delete userValue.refresh;
-      user.assign({ ...userValue }).write();
+      user.refresh = undefined;
+      await user.save();
       res.sendStatus(204);
     }
   }

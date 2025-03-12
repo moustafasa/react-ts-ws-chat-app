@@ -12,7 +12,7 @@ export const userSchema = z.object({
   name: z.string(),
   email: z.string().email(),
   room: z.coerce.string(),
-  img: z.string(),
+  img: z.string().optional(),
   active: z.boolean(),
 });
 
@@ -34,7 +34,7 @@ export const latestMessagesSchema = z.object({
   latestMessage: messageSchema.or(z.undefined()),
   unReadMessages: z.coerce.number(),
   lastSeen: z.array(
-    z.object({ id: z.coerce.string(), timeStamp: z.coerce.string() })
+    z.object({ userId: z.coerce.string(), timeStamp: z.coerce.string() })
   ),
 });
 
