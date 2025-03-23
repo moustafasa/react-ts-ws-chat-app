@@ -16,19 +16,25 @@ import {
   MessageFromWsMessageScheme,
   MessageType,
   arrayOfMessageSchema,
-  arrayOfLatestMessageSchema,
 } from "../../models/chat";
 import type { RootState } from "../../app/store";
 import { getCurrentUser, getToken } from "../auth/authSlice";
-import {
-  getLastSeenArr,
-  recieveNewMessage,
-  resetUnReadMessage,
-  setLatestMessage,
-  updateLatestMessage,
-} from "./chatSlice";
+// import {
+//   // getLastSeenArr,
+//   recieveNewMessage,
+//   resetUnReadMessage,
+//   setLatestMessage,
+//   updateLatestMessage,
+// } from "./chatSlice";
 
-const chatsAdapter = createEntityAdapter<ParsedChatType>();
+const chatsAdapter = createEntityAdapter<ParsedChatType>({
+  sortComparer: (a, b) => {
+    return (
+      new Date(b.latestMessage?.timeStamp || "").getTime() -
+      new Date(a.latestMessage?.timeStamp || "").getTime()
+    );
+  },
+});
 
 const messagesAdapter = createEntityAdapter<MessageType>({
   sortComparer: (a, b) => {
@@ -50,7 +56,7 @@ const getSocket = (token: string) => {
   return socket;
 };
 
-type GetChatsType = {
+export type GetChatsType = {
   chats: EntityState<ParsedChatType, string>;
   users: EntityState<ChatUserType, string>;
 };
@@ -63,7 +69,6 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const parsedMessages = arrayOfMessageSchema.parse(messages);
         return messagesAdapter.setAll(messagesState, parsedMessages);
       },
-      providesTags: ["Messages"],
       async onCacheEntryAdded(
         chatId,
         {
@@ -82,6 +87,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
           await cacheDataLoaded;
           const onMessageListener = (e: MessageEvent) => {
             const message = wsMessageFromJsonSchema.parse(e.data);
+            console.log(message, " done");
             switch (message.type) {
               case WsType.MESSAGE: {
                 updateCachedData((draft) => {
@@ -93,12 +99,16 @@ export const chatApiSlice = apiSlice.injectEndpoints({
                     messagesAdapter.addOne(draft, parsedMessage);
                   }
                 });
+
                 break;
               }
               case WsType.READ: {
+                const getChatsResult = chatApiSlice.endpoints.getChats.select(
+                  undefined
+                )(getState() as RootState);
                 const oldLastSeen = getLastSeenArr(
-                  getState() as RootState,
-                  message?.room || ""
+                  getChatsResult.data,
+                  message.room || ""
                 );
 
                 const newLastSeen = oldLastSeen.map((obj) =>
@@ -111,12 +121,16 @@ export const chatApiSlice = apiSlice.injectEndpoints({
                 );
 
                 dispatch(
-                  updateLatestMessage({
-                    id: message.room || "",
-                    changes: {
-                      lastSeen: newLastSeen,
-                    },
-                  })
+                  chatApiSlice.util.updateQueryData(
+                    "getChats",
+                    undefined,
+                    (draft) => {
+                      chatsAdapter.updateOne(draft.chats, {
+                        id: message.room as string,
+                        changes: { lastSeen: newLastSeen },
+                      });
+                    }
+                  )
                 );
               }
             }
@@ -133,16 +147,11 @@ export const chatApiSlice = apiSlice.injectEndpoints({
     }),
     getChats: builder.query<GetChatsType, void>({
       query: () => "/chats",
-      transformResponse: (chats: unParsedChatType[], meta) => {
+      transformResponse: (chats: unParsedChatType[]) => {
         const parsedUsers = chats.map((chat) =>
           userSchema.parse({ ...chat.user, room: chat.id })
         );
         const parsedChat = arrayOfChatSchema.parse(chats);
-        const latestMessage = arrayOfLatestMessageSchema.parse(chats);
-        if (meta?.dispatch) {
-          meta.dispatch(setLatestMessage(latestMessage));
-        }
-
         return {
           chats: chatsAdapter.setAll(chatsState, parsedChat),
           users: usersAdapter.addMany(usersState, parsedUsers),
@@ -198,7 +207,37 @@ export const chatApiSlice = apiSlice.injectEndpoints({
                   message
                 ) as MessageType;
 
-                dispatch(recieveNewMessage(latestMessage));
+                updateCachedData((draft) => {
+                  chatsAdapter.updateOne(draft.chats, {
+                    id: message.room as string,
+                    changes: { latestMessage },
+                  });
+                });
+
+                updateCachedData((draft) => {
+                  chatsAdapter.updateOne(draft.chats, {
+                    id: message.room as string,
+                    changes: {
+                      unReadMessages:
+                        draft.chats.entities[message.room as string]
+                          ?.unReadMessages + 1,
+                    },
+                  });
+                });
+
+                break;
+              }
+              case WsType.CREATE: {
+                // const latestMessage = MessageFromWsMessageScheme.parse(
+                //   message
+                // ) as MessageType;
+
+                // dispatch(recieveNewMessage(latestMessage));
+                dispatch(
+                  chatApiSlice.util.invalidateTags([
+                    { type: "Chats", id: "List" },
+                  ])
+                );
 
                 break;
               }
@@ -219,7 +258,6 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const token = getToken(getState() as RootState);
         const userId = getCurrentUser(getState() as RootState);
         const ws = getSocket(token);
-        console.log(ws);
 
         if (ws.readyState === ws.OPEN) {
           ws.send(
@@ -248,8 +286,22 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const token = getToken(getState() as RootState);
         const userId = getCurrentUser(getState() as RootState);
         const ws = getSocket(token);
+        console.log("done read");
         if (ws.readyState === ws.OPEN) {
-          dispatch(resetUnReadMessage(id));
+          // dispatch(resetUnReadMessage(id));
+          dispatch(
+            chatApiSlice.util.updateQueryData(
+              "getChats",
+              undefined,
+              (draft) => {
+                chatsAdapter.updateOne(draft.chats, {
+                  id,
+                  changes: { unReadMessages: 0 },
+                });
+              }
+            )
+          );
+          console.log("done");
 
           ws.send(
             JSON.stringify({
@@ -261,6 +313,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
           );
         } else {
           ws.addEventListener("open", () => {
+            console.log("done");
             ws.send(
               JSON.stringify({
                 type: WsType.READ,
@@ -281,7 +334,8 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         method: "post",
         data: { email },
       }),
-      invalidatesTags: [{ type: "Chats", id: "List" }, "Messages"],
+
+      invalidatesTags: [{ type: "Chats", id: "List" }],
     }),
   }),
 });
@@ -313,6 +367,21 @@ export const selectUserByRoom = createSelector(
     const user = users.find((user) => user.room === roomId);
     return user;
   }
+);
+export const getLastSeenArr = createSelector(
+  getChatById,
+
+  (room) => room?.lastSeen
+);
+export const getLastSeenTimeStamp = createSelector(
+  [getLastSeenArr, (state, room, userId) => userId],
+  (lastSeen, userId) =>
+    lastSeen?.find((user) => user.userId !== userId)?.timeStamp
+);
+
+export const getUnReadNumber = createSelector(
+  getChatById,
+  (meta) => meta?.unReadMessages || 0
 );
 
 export const {

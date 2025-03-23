@@ -55,9 +55,12 @@ server.use(checkAuth);
 /////////////// chats ////////////////////
 //////////////////////////////////////////
 
-server.use(chatRouter);
-
 const wss = new WebSocketServer({ noServer: true, path: "/chat" });
+server.use((req, res, next) => {
+  req.wss = wss;
+  next();
+});
+server.use(chatRouter);
 
 wss.on("connection", async (ws) => {
   await getUserRooms(ws);

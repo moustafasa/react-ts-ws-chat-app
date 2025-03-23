@@ -1,6 +1,39 @@
 import Users from "../models/Users.js";
 import Rooms from "../models/Rooms.js";
 
+export const refactorChats = (chat, userId) => {
+  const user = chat.users[0];
+  const messages = chat.messages;
+
+  messages.sort(
+    (a, b) => new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime()
+  );
+
+  const modifiedUser = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    img: user.img,
+    active: user.activeState,
+  };
+
+  const lastSeenStamp = chat.lastSeen.find(
+    (seen) => seen.userId === userId
+  ).timeStamp;
+
+  return {
+    id: chat.id,
+    user: modifiedUser,
+    latestMessage: messages[messages.length - 1],
+    unReadMessages: messages.filter(
+      (msg) =>
+        !msg.userId.includes(userId) &&
+        new Date(msg.timeStamp).getTime() > new Date(lastSeenStamp).getTime()
+    ).length,
+    lastSeen: chat.lastSeen,
+  };
+};
+
 export const getChats = async (req, res) => {
   // get the rooms of currentUser
   const chats = await Rooms.find({ users: req.userId }).populate({
@@ -9,39 +42,7 @@ export const getChats = async (req, res) => {
   });
 
   // refactor chat to send needed values
-  const sendedChats = chats.map((chat) => {
-    const user = chat.users[0];
-    const messages = chat.messages;
-
-    messages.sort(
-      (a, b) =>
-        new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime()
-    );
-
-    const modifiedUser = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      img: user.img,
-      active: user.activeState,
-    };
-
-    const lastSeenStamp = chat.lastSeen.find(
-      (seen) => seen.userId === req.userId
-    ).timeStamp;
-
-    return {
-      id: chat.id,
-      user: modifiedUser,
-      latestMessage: messages[messages.length - 1],
-      unReadMessages: messages.filter(
-        (msg) =>
-          !msg.userId.includes(req.userId) &&
-          new Date(msg.timeStamp).getTime() > new Date(lastSeenStamp).getTime()
-      ).length,
-      lastSeen: chat.lastSeen,
-    };
-  });
+  const sendedChats = chats.map((chat) => refactorChats(chat, req.userId));
 
   res.send(sendedChats);
 };
@@ -66,7 +67,13 @@ export const createChat = async (req, res) => {
           { userId: otherUser.id, timeStamp: new Date().toISOString() },
         ],
       };
-      await Rooms.create(room);
+      const createdRoom = await Rooms.create(room);
+
+      req.wss.clients.forEach((client) => {
+        if ([currentUser.id, otherUser.id].includes(client.userId)) {
+          client.rooms.push(createdRoom.id);
+        }
+      });
     }
   }
   res.sendStatus(200);

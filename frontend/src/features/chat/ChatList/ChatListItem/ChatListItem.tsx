@@ -3,8 +3,6 @@ import { ParsedChatType } from "../../../../models/chat";
 import { getUserById, useGetChatsQuery } from "../../chatApiSlice";
 import sass from "./ChatListItem.module.scss";
 import classNames from "classnames";
-import { useAppSelector } from "../../../../app/hooks";
-import { getRoomMetaDataById } from "../../chatSlice";
 import { Badge } from "react-bootstrap";
 
 type PropsType = { chat: ParsedChatType };
@@ -16,9 +14,7 @@ const ChatListItem = ({ chat }: PropsType) => {
       ...rest,
     }),
   });
-  const roomMeta = useAppSelector((state) =>
-    getRoomMetaDataById(state, chat.id)
-  );
+  console.log(chat.unReadMessages);
 
   return (
     <NavLink
@@ -67,10 +63,10 @@ const ChatListItem = ({ chat }: PropsType) => {
               textOverflow: "ellipsis",
             }}
           >
-            {roomMeta.latestMessage?.msg || "no messages yet"}
+            {chat.latestMessage?.msg || "no messages yet"}
           </p>
-          {roomMeta.unReadMessages > 0 && (
-            <Badge bg="danger">{roomMeta.unReadMessages}</Badge>
+          {chat.unReadMessages > 0 && (
+            <Badge bg="danger">{chat.unReadMessages}</Badge>
           )}
         </div>
       </div>

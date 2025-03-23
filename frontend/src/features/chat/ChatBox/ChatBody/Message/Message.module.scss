@@ -7,7 +7,10 @@
   }
   .message-cont {
     position: relative;
-    width: 40%;
+    width: 100%;
+    @media (min-width: 768px) {
+      width: 40%;
+    }
   }
 
   &:not(.me) {

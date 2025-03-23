@@ -47,7 +47,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
     }),
     logout: builder.mutation<void, void>({
       query: () => "/logout",
-      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
           dispatch(logout());
@@ -59,5 +59,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useRefreshMutation } =
-  authApiSlice;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useRefreshMutation,
+  useLogoutMutation,
+} = authApiSlice;

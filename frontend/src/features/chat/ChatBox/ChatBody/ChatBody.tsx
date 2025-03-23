@@ -3,12 +3,14 @@ import Message from "./Message/Message";
 import { Fragment, useEffect, useRef } from "react";
 import {
   getAllMessages,
+  GetChatsType,
+  getUnReadNumber,
+  useGetChatsQuery,
   useGetMessagesQuery,
   useReadMessageMutation,
 } from "../../chatApiSlice";
 import sass from "./ChatBody.module.scss";
 import { useAppSelector } from "../../../../app/hooks";
-import { getUnReadNumber } from "../../chatSlice";
 
 const ChatBody = () => {
   const { room } = useParams();
@@ -17,9 +19,11 @@ const ChatBody = () => {
       return { messages: getAllMessages(data), ...rest };
     },
   });
-  const unReadMessages = useAppSelector((state) =>
-    getUnReadNumber(state, room || "")
-  );
+  const unReadMessages = useGetChatsQuery(undefined, {
+    selectFromResult: ({ data }) => ({
+      unReadNumber: getUnReadNumber(data, room || ""),
+    }),
+  }).unReadNumber;
 
   const [readMessage] = useReadMessageMutation();
 
@@ -30,6 +34,7 @@ const ChatBody = () => {
   }, [room, isFetching]);
 
   useEffect(() => {
+    console.log(unReadMessages);
     if (unReadMessages > 0) readMessage(room || "");
   }, [room, readMessage, unReadMessages]);
 

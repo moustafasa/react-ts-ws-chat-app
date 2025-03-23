@@ -44,47 +44,47 @@ const chatSlice = createSlice({
   },
 });
 
-export const recieveNewMessage =
-  (latestMessage: MessageType) =>
-  (dispatch: AppDispatch, getState: () => RootState) => {
-    const user = getCurrentUser(getState());
-    dispatch(
-      updateLatestMessage({
-        id: latestMessage.room as string,
-        changes: {
-          latestMessage,
-        },
-      })
-    );
-    if (latestMessage.userId !== user) {
-      dispatch(increaseUnReadMessage(latestMessage.room));
-    }
-  };
+// export const recieveNewMessage =
+//   (latestMessage: MessageType) =>
+//   (dispatch: AppDispatch, getState: () => RootState) => {
+//     const user = getCurrentUser(getState());
+//     dispatch(
+//       updateLatestMessage({
+//         id: latestMessage.room as string,
+//         changes: {
+//           latestMessage,
+//         },
+//       })
+//     );
+//     if (latestMessage.userId !== user) {
+//       dispatch(increaseUnReadMessage(latestMessage.room));
+//     }
+//   };
 
 export default chatSlice.reducer;
-export const {
-  setLatestMessage,
-  updateLatestMessage,
-  increaseUnReadMessage,
-  resetUnReadMessage,
-} = chatSlice.actions;
-export const { selectById: getRoomMetaDataById } =
-  latestMessagesAdapter.getSelectors<RootState>(
-    (state) => state.chat.latestMessage
-  );
+// export const {
+//   setLatestMessage,
+//   updateLatestMessage,
+//   increaseUnReadMessage,
+//   resetUnReadMessage,
+// } = chatSlice.actions;
+// export const { selectById: getRoomMetaDataById } =
+//   latestMessagesAdapter.getSelectors<RootState>(
+//     (state) => state.chat.latestMessage
+//   );
 
-export const getLastSeenArr = createSelector(
-  getRoomMetaDataById,
+// export const getLastSeenArr = createSelector(
+//   getRoomMetaDataById,
 
-  (room) => room?.lastSeen
-);
-export const getLastSeenTimeStamp = createSelector(
-  [getLastSeenArr, (state, room, userId) => userId],
-  (lastSeen, userId) =>
-    lastSeen?.find((user) => user.userId !== userId)?.timeStamp
-);
+//   (room) => room?.lastSeen
+// );
+// export const getLastSeenTimeStamp = createSelector(
+//   [getLastSeenArr, (state, room, userId) => userId],
+//   (lastSeen, userId) =>
+//     lastSeen?.find((user) => user.userId !== userId)?.timeStamp
+// );
 
-export const getUnReadNumber = createSelector(
-  getRoomMetaDataById,
-  (meta) => meta?.unReadMessages || 0
-);
+// export const getUnReadNumber = createSelector(
+//   getRoomMetaDataById,
+//   (meta) => meta?.unReadMessages || 0
+// );

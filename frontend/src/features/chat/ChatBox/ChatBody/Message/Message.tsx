@@ -1,13 +1,16 @@
 import classNames from "classnames";
 import sass from "./Message.module.scss";
-import { getUserById, useGetChatsQuery } from "../../../chatApiSlice";
+import {
+  getLastSeenTimeStamp,
+  getUserById,
+  useGetChatsQuery,
+} from "../../../chatApiSlice";
 import { useAppSelector } from "../../../../../app/hooks";
 import { getCurrentUser } from "../../../../auth/authSlice";
 import { differenceInDays, formatDistance, formatRelative } from "date-fns";
 import type { MessageType } from "../../../../../models/chat";
 import { FaCheckDouble } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { getLastSeenTimeStamp } from "../../../chatSlice";
 
 type PropsType = {
   message: MessageType;
@@ -36,9 +39,12 @@ const Message = ({ message }: PropsType) => {
 
   const timeStamp = new Date(message.timeStamp);
 
-  const lastSeen = useAppSelector((state) =>
-    getLastSeenTimeStamp(state, room || "", message.userId)
-  );
+  const lastSeen = useGetChatsQuery(undefined, {
+    selectFromResult: ({ data }) => ({
+      lastSeen: getLastSeenTimeStamp(data, room || "", message.userId),
+    }),
+  }).lastSeen;
+  console.log(lastSeen);
 
   return (
     <div className={messageClass}>

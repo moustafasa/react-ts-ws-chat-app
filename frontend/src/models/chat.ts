@@ -5,6 +5,7 @@ export enum WsType {
   "LEAVE" = "LEAVE",
   "MESSAGE" = "MESSAGE",
   "READ" = "READ",
+  "CREATE" = "CREATE",
 }
 
 export const userSchema = z.object({
@@ -27,11 +28,20 @@ export const messageSchema = z.object({
 const chatSchema = z.object({
   id: z.coerce.string(),
   user: userSchema.transform((user) => user.id),
+  latestMessage: messageSchema
+    .pick({ msg: true, timeStamp: true })
+    .or(z.undefined()),
+  unReadMessages: z.coerce.number(),
+  lastSeen: z.array(
+    z.object({ userId: z.coerce.string(), timeStamp: z.coerce.string() })
+  ),
 });
 
 export const latestMessagesSchema = z.object({
   id: z.coerce.string(),
-  latestMessage: messageSchema.or(z.undefined()),
+  latestMessage: messageSchema
+    .pick({ msg: true, timeStamp: true })
+    .or(z.undefined()),
   unReadMessages: z.coerce.number(),
   lastSeen: z.array(
     z.object({ userId: z.coerce.string(), timeStamp: z.coerce.string() })
@@ -88,6 +98,7 @@ export type ParsedChatType = z.infer<typeof chatSchema>;
 export type unParsedChatType = Omit<ParsedChatType, "user"> & {
   user: ChatUserType;
   latestMessage: MessageType | undefined;
+  unReadMessages: number;
 };
 
 export type WsMessage = z.infer<typeof wsMessageSchema>;

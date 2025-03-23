@@ -1,12 +1,21 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import { getToken } from "../../features/auth/authSlice";
 import { useEffect, useRef } from "react";
+import { useLogoutMutation } from "../../features/auth/authApiSlice";
 
 const NavBar = () => {
   const token = useAppSelector(getToken);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [logout, { isSuccess, isLoading }] = useLogoutMutation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/", { replace: true });
+    }
+  }, [isSuccess, navigate]);
 
   useEffect(() => {
     const hideOnBlur = (e: MouseEvent) => {
@@ -37,7 +46,7 @@ const NavBar = () => {
             <Link to={"/"} className="nav-link">
               home
             </Link>
-            {!token ? (
+            {!token || isLoading ? (
               <>
                 <Link to={"/login"} className="nav-link">
                   Login
@@ -52,9 +61,14 @@ const NavBar = () => {
                   chat
                 </Link>
 
-                <Link to="/logout" className="nav-link">
+                <button
+                  onClick={() => {
+                    logout();
+                  }}
+                  className="nav-link"
+                >
                   logout
-                </Link>
+                </button>
               </>
             )}
           </Nav>

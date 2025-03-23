@@ -35,8 +35,10 @@ export const onMessage = async (message, wss, ws) => {
   chatRoom.messages.push(createdMessage);
 
   await chatRoom.save();
+  console.log(message, " jfdskla");
 
   wss.clients.forEach((client) => {
+    console.log("client");
     if (client.rooms.find((clientRoom) => clientRoom === room)) {
       client.send(
         JSON.stringify({
