@@ -37,7 +37,8 @@ const axiosBaseQuery =
     const defaultHeaders: AxiosRequestConfig["headers"] = {
       "Content-Type": "application/json",
     };
-    const baseUrl: string = `http://localhost:3000` as const;
+    const baseUrl: string =
+      `https://react-ts-ws-chat-app-production.up.railway.app` as const;
     const token = getToken(getState() as RootState);
 
     // add authorization header if there is token

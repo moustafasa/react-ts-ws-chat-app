@@ -108,6 +108,8 @@ export const refresh = async (req, res) => {
   // Get the refresh token from the cookie
   const refreshToken = req.cookies.refreshToken;
 
+  console.log(refreshToken);
+
   // Verify the refresh token
   const decoded = verifyToken(refreshToken, "refresh");
 
