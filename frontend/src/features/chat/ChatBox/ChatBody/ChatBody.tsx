@@ -1,20 +1,22 @@
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import Message from "./Message/Message";
 import { Fragment, useEffect, useRef } from "react";
 import {
   getAllMessages,
-  GetChatsType,
   getUnReadNumber,
   useGetChatsQuery,
   useGetMessagesQuery,
   useReadMessageMutation,
 } from "../../chatApiSlice";
 import sass from "./ChatBody.module.scss";
-import { useAppSelector } from "../../../../app/hooks";
 
 const ChatBody = () => {
   const { room } = useParams();
-  const { messages = [], isFetching } = useGetMessagesQuery(room || "", {
+  const {
+    messages = [],
+    isFetching,
+    error,
+  } = useGetMessagesQuery(room || "", {
     selectFromResult: ({ data, ...rest }) => {
       return { messages: getAllMessages(data), ...rest };
     },
@@ -34,7 +36,6 @@ const ChatBody = () => {
   }, [room, isFetching]);
 
   useEffect(() => {
-    console.log(unReadMessages);
     if (unReadMessages > 0) readMessage(room || "");
   }, [room, readMessage, unReadMessages]);
 
@@ -42,6 +43,8 @@ const ChatBody = () => {
     spanRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
+  if (error && "status" in error && error.status === 404)
+    return <Navigate replace to="/not-found" />;
   return (
     <div
       className={

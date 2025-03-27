@@ -16,6 +16,7 @@ import {
   MessageFromWsMessageScheme,
   MessageType,
   arrayOfMessageSchema,
+  chatSchema,
 } from "../../models/chat";
 import type { RootState } from "../../app/store";
 import { getCurrentUser, getToken } from "../auth/authSlice";
@@ -87,7 +88,6 @@ export const chatApiSlice = apiSlice.injectEndpoints({
           await cacheDataLoaded;
           const onMessageListener = (e: MessageEvent) => {
             const message = wsMessageFromJsonSchema.parse(e.data);
-            console.log(message, " done");
             switch (message.type) {
               case WsType.MESSAGE: {
                 updateCachedData((draft) => {
@@ -168,13 +168,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
 
       async onCacheEntryAdded(
         args,
-        {
-          cacheDataLoaded,
-          cacheEntryRemoved,
-          getState,
-          updateCachedData,
-          dispatch,
-        }
+        { cacheDataLoaded, cacheEntryRemoved, getState, updateCachedData }
       ) {
         const token = getToken(getState() as RootState);
         const ws = getSocket(token);
@@ -214,32 +208,34 @@ export const chatApiSlice = apiSlice.injectEndpoints({
                   });
                 });
 
-                updateCachedData((draft) => {
-                  chatsAdapter.updateOne(draft.chats, {
-                    id: message.room as string,
-                    changes: {
-                      unReadMessages:
-                        draft.chats.entities[message.room as string]
-                          ?.unReadMessages + 1,
-                    },
+                if (
+                  message.userId !== getCurrentUser(getState() as RootState)
+                ) {
+                  updateCachedData((draft) => {
+                    chatsAdapter.updateOne(draft.chats, {
+                      id: message.room as string,
+                      changes: {
+                        unReadMessages:
+                          draft.chats.entities[message.room as string]
+                            ?.unReadMessages + 1,
+                      },
+                    });
                   });
-                });
+                }
 
                 break;
               }
               case WsType.CREATE: {
-                // const latestMessage = MessageFromWsMessageScheme.parse(
-                //   message
-                // ) as MessageType;
-
-                // dispatch(recieveNewMessage(latestMessage));
-                dispatch(
-                  chatApiSlice.util.invalidateTags([
-                    { type: "Chats", id: "List" },
-                  ])
-                );
-
-                break;
+                const chat = message.chat;
+                const parsedUsers = userSchema.parse({
+                  ...chat.user,
+                  room: chat.id,
+                });
+                const parsedChat = chatSchema.parse(chat);
+                updateCachedData((draft) => {
+                  chatsAdapter.addOne(draft.chats, parsedChat);
+                  usersAdapter.addOne(draft.users, parsedUsers);
+                });
               }
             }
           };
@@ -278,7 +274,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
             );
           });
         }
-        return { data: [] };
+        return { data: null };
       },
     }),
     readMessage: builder.mutation<unknown, string>({
@@ -286,9 +282,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
         const token = getToken(getState() as RootState);
         const userId = getCurrentUser(getState() as RootState);
         const ws = getSocket(token);
-        console.log("done read");
         if (ws.readyState === ws.OPEN) {
-          // dispatch(resetUnReadMessage(id));
           dispatch(
             chatApiSlice.util.updateQueryData(
               "getChats",
@@ -301,7 +295,6 @@ export const chatApiSlice = apiSlice.injectEndpoints({
               }
             )
           );
-          console.log("done");
 
           ws.send(
             JSON.stringify({
@@ -313,7 +306,6 @@ export const chatApiSlice = apiSlice.injectEndpoints({
           );
         } else {
           ws.addEventListener("open", () => {
-            console.log("done");
             ws.send(
               JSON.stringify({
                 type: WsType.READ,
@@ -324,7 +316,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
             );
           });
         }
-        return { data: [] };
+        return { data: null };
       },
     }),
 

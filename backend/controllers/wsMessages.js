@@ -35,10 +35,8 @@ export const onMessage = async (message, wss, ws) => {
   chatRoom.messages.push(createdMessage);
 
   await chatRoom.save();
-  console.log(message, " jfdskla");
 
   wss.clients.forEach((client) => {
-    console.log("client");
     if (client.rooms.find((clientRoom) => clientRoom === room)) {
       client.send(
         JSON.stringify({
@@ -56,7 +54,10 @@ export const socketClose = (wss, ws) => async () => {
   await Users.findByIdAndUpdate(ws.userId, { activeState: false });
 
   wss.clients.forEach((client) => {
-    if (client !== ws && client.rooms.find((room) => ws.rooms.includes(room))) {
+    if (
+      client !== ws &&
+      client.rooms?.find((room) => ws.rooms.includes(room))
+    ) {
       client.send(JSON.stringify({ type: "LEAVE", userId: ws.userId }));
     }
   });

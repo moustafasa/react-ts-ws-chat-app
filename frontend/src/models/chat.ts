@@ -25,7 +25,7 @@ export const messageSchema = z.object({
   timeStamp: z.coerce.string(),
 });
 
-const chatSchema = z.object({
+export const chatSchema = z.object({
   id: z.coerce.string(),
   user: userSchema.transform((user) => user.id),
   latestMessage: messageSchema
@@ -56,18 +56,28 @@ export const MessagesMetaSchema = z.object({
   userId: z.coerce.string(),
 });
 
-const wsMessageSchema = z.object({
-  type: z.nativeEnum(WsType),
-  room: z.coerce.string().optional(),
-  userId: z.coerce.string(),
-  msg: z.string().optional(),
-  meta: z
-    .object({
-      id: z.coerce.string().optional(),
-      timeStamp: z.coerce.string().optional(),
-    })
-    .optional(),
-});
+const wsMessageSchema = z.union([
+  z.object({
+    type: z.nativeEnum(WsType).refine((data) => data !== WsType.CREATE),
+    room: z.coerce.string().optional(),
+    userId: z.coerce.string(),
+    msg: z.string().optional(),
+    meta: z
+      .object({
+        id: z.coerce.string().optional(),
+        timeStamp: z.coerce.string().optional(),
+      })
+      .optional(),
+  }),
+  z.object({
+    type: z.nativeEnum(WsType).refine((data) => data === WsType.CREATE),
+    chat: chatSchema.extend({
+      user: userSchema,
+      latestMessage: messageSchema.optional(),
+      unReadMessages: z.number(),
+    }),
+  }),
+]);
 
 export const wsMessageFromJsonSchema = z
   .string()
@@ -76,7 +86,9 @@ export const wsMessageFromJsonSchema = z
 
 export const MessageFromWsMessageScheme = wsMessageSchema.transform(
   (message) => {
-    const { room, userId, msg, meta } = message;
+    const { room, userId, msg, meta } = message as typeof message & {
+      type: WsType.MESSAGE;
+    };
 
     return {
       id: meta?.id,

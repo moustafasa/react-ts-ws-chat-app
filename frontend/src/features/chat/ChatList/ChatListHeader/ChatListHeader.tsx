@@ -4,17 +4,16 @@ import sass from "./ChatListHeader.module.scss";
 import { Button, Form } from "react-bootstrap";
 import { RiUserAddFill } from "react-icons/ri";
 import { useCreateChatMutation } from "../../chatApiSlice";
+import { FaPlusCircle } from "react-icons/fa";
 
 const ChatListHeader = () => {
-  const [createChat] = useCreateChatMutation();
+  const [createChat, { error }] = useCreateChatMutation();
   const [showForm, setShowForm] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
 
-  const formClass = classNames(
-    "d-flex gap-3 px-3 justify-content-center align-items-center mt-4",
-    sass["add-user-form"],
-    { [sass.show]: showForm }
-  );
+  const formClass = classNames(" px-3  mt-4", sass["add-user-form"], {
+    [sass.show]: showForm,
+  });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,13 +34,29 @@ const ChatListHeader = () => {
         </Button>
       </h2>
       <Form className={formClass} onSubmit={handleSubmit}>
-        <Form.Control
-          type="text"
-          placeholder="Type email to add"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Button type="submit">Add</Button>
+        <div className="d-flex gap-3 justify-content-center align-items-center">
+          <Form.Control
+            type="text"
+            placeholder="Type email to add"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            isInvalid={!!error}
+          />
+          <Button type="submit">
+            <FaPlusCircle />
+          </Button>
+        </div>
+        {error && (
+          <Form.Text className="text-danger text-capitalize">
+            {"status" in error
+              ? error.status === 400
+                ? "chat already exists"
+                : error.status === 404
+                ? "invalid email"
+                : "server error"
+              : "An unknown error occurred"}
+          </Form.Text>
+        )}
       </Form>
     </>
   );

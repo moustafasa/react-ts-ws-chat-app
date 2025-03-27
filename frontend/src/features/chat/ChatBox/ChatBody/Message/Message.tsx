@@ -44,7 +44,6 @@ const Message = ({ message }: PropsType) => {
       lastSeen: getLastSeenTimeStamp(data, room || "", message.userId),
     }),
   }).lastSeen;
-  console.log(lastSeen);
 
   return (
     <div className={messageClass}>
