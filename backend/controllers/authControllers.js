@@ -20,7 +20,11 @@ const createToken = (data, type) => {
 
 const setRefreshToken = async (payload, res) => {
   const refresh = createToken(payload, "refresh");
-  res.cookie("refreshToken", refresh, { httpOnly: true });
+  res.cookie("refreshToken", refresh, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
   const user = await Users.findOne({ email: payload.email });
   user.refresh = refresh;
   await user.save();

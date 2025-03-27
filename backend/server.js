@@ -12,14 +12,14 @@ import {
   socketClose,
   upgradeUrl,
 } from "./controllers/wsMessages.js";
-import { Mongoose } from "mongoose";
 import authRouter from "./routes/auth.js";
 import chatRouter from "./routes/chat.js";
 import { checkAuth } from "./middlewares/checkAuth.js";
-import { checkOrigin } from "./middlewares/checkOrigin.js";
+import { allowedHosts } from "./middlewares/checkOrigin.js";
 import { hashPassword } from "./middlewares/hashPassword.js";
 import { configDotenv } from "dotenv";
 import dbConnect from "./config/dbConnect.js";
+import cors from "cors";
 
 configDotenv();
 const server = express();
@@ -43,7 +43,7 @@ server.use(
 );
 
 // Use the middleware function before the router
-server.use(checkOrigin);
+server.use(cors({ origin: allowedHosts, credentials: true }));
 server.use(hashPassword);
 
 server.use(authRouter);
