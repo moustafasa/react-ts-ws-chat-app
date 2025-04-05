@@ -1,8 +1,8 @@
 export const allowedHosts = [
   "http://localhost:3001",
-  "http://localhost:5173",
-  "http://localhost:3002",
-  "https://react-ts-ws-chat-app-production.up.railway.app",
+  // "http://localhost:5173",
+  // "http://localhost:3002",
+  // "https://react-ts-ws-chat-app-production.up.railway.app",
 ];
 // // Create a middleware function that checks the request origin
 // export const checkOrigin = (req, res, next) => {
