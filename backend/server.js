@@ -43,7 +43,19 @@ server.use(
 );
 
 // Use the middleware function before the router
-server.use(cors({ origin: allowedHosts, credentials: true }));
+server.use(
+  cors({
+    origin: (origin, callback) => {
+      // Check if the origin is in the allowed hosts
+      if (allowedHosts.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 server.use(hashPassword);
 
 server.use(authRouter);
