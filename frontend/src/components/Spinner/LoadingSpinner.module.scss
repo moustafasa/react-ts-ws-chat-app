@@ -1,0 +1,71 @@
+@use "../../sass/helpers/mixins" as *;
+@use "../../sass/variables/colors" as *;
+@use "../../sass/variables/others" as *;
+
+$blue-3-color: #005377;
+
+.spinnerCont {
+  width: 100%;
+  @include centerbyflex(null);
+  flex-direction: column;
+  padding-block: 50px;
+  gap: 20px;
+  font-family: $main-font;
+  .spinner {
+    position: relative;
+    width: 20px;
+    height: 30px;
+    background-color: $white;
+    box-shadow: 0 0 10px $white;
+    border-radius: 50%;
+    &::before {
+      content: "";
+      @include centerbyposition("both", absolute);
+      @include circle(calc(100% + 10px));
+      border-radius: 50%;
+      background-color: transparent;
+      border: 5px solid $success;
+      border-top-color: transparent;
+      box-sizing: content-box;
+      animation: spinner-circle-1 3s linear infinite;
+      transform-origin: center center;
+      transform-style: preserve-3d;
+    }
+    &::after {
+      content: "";
+      @include centerbyposition("both", absolute);
+      @include circle(calc(100% + 20px));
+      translate: -50% -50%;
+      border-radius: 50%;
+      background-color: transparent;
+      border: 5px solid $blue-3-color;
+      border-bottom-color: transparent;
+      box-sizing: content-box;
+      animation: spinner-circle-2 3s linear infinite;
+      transform-origin: center center;
+      transform-style: preserve-3d;
+    }
+  }
+
+  .label {
+    color: $white;
+    font-size: 1.2rem;
+  }
+}
+
+@keyframes spinner-circle-1 {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 0 1 0 360deg;
+  }
+}
+@keyframes spinner-circle-2 {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: -360deg;
+  }
+}

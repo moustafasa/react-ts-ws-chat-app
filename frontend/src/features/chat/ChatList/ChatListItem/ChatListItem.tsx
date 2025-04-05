@@ -14,7 +14,6 @@ const ChatListItem = ({ chat }: PropsType) => {
       ...rest,
     }),
   });
-  console.log(chat.unReadMessages, " fjdskla ");
 
   return (
     <NavLink

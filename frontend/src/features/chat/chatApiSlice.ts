@@ -52,7 +52,9 @@ let socket: WebSocket | null;
 
 const getSocket = (token: string) => {
   if (!socket || socket.readyState === socket.CLOSED) {
-    socket = new WebSocket(`ws://localhost:3000/chat?token=${token}`);
+    socket = new WebSocket(
+      `wss://react-ts-ws-chat-app-production.up.railway.app/chat?token=${token}`
+    );
   }
   return socket;
 };
@@ -250,21 +252,51 @@ export const chatApiSlice = apiSlice.injectEndpoints({
     }),
 
     sendMessage: builder.mutation<unknown, Partial<WsMessage>>({
-      queryFn(message, { getState }) {
+      queryFn(message, { getState, dispatch }) {
         const token = getToken(getState() as RootState);
         const userId = getCurrentUser(getState() as RootState);
         const ws = getSocket(token);
+        const tempId = `temp-${Date.now()}`;
+        const optimisticMessage = {
+          id: tempId,
+          room: (message as { room: string }).room,
+          userId,
+          msg: (message as { msg: string }).msg,
+          timeStamp: new Date().toISOString(),
+        };
 
-        if (ws.readyState === ws.OPEN) {
-          ws.send(
-            JSON.stringify({
-              ...message,
-              userId,
-              meta: { timeStamp: new Date().toISOString() },
-            })
-          );
-        } else {
-          ws.addEventListener("open", () => {
+        ws.addEventListener("message", (e: MessageEvent) => {
+          const parsedMessage = wsMessageFromJsonSchema.parse(e.data);
+          if (parsedMessage.type === WsType.MESSAGE) {
+            if (
+              parsedMessage.msg === (message as { msg: string }).msg &&
+              parsedMessage.room === (message as { room: string }).room &&
+              parsedMessage.userId === userId
+            ) {
+              dispatch(
+                chatApiSlice.util.updateQueryData(
+                  "getMessages",
+                  (message as { room: string }).room || "",
+                  (draft) => {
+                    messagesAdapter.removeOne(draft, optimisticMessage.id);
+                  }
+                )
+              );
+            }
+          }
+        });
+
+        try {
+          if (ws.readyState === ws.OPEN) {
+            dispatch(
+              chatApiSlice.util.updateQueryData(
+                "getMessages",
+                (message as { room: string }).room || "",
+                (draft) => {
+                  messagesAdapter.addOne(draft, optimisticMessage);
+                }
+              )
+            );
             ws.send(
               JSON.stringify({
                 ...message,
@@ -272,8 +304,38 @@ export const chatApiSlice = apiSlice.injectEndpoints({
                 meta: { timeStamp: new Date().toISOString() },
               })
             );
-          });
+          } else {
+            ws.addEventListener("open", () => {
+              dispatch(
+                chatApiSlice.util.updateQueryData(
+                  "getMessages",
+                  (message as { room: string }).room || "",
+                  (draft) => {
+                    messagesAdapter.addOne(draft, optimisticMessage);
+                  }
+                )
+              );
+              ws.send(
+                JSON.stringify({
+                  ...message,
+                  userId,
+                  meta: { timeStamp: new Date().toISOString() },
+                })
+              );
+            });
+          }
+        } catch (err) {
+          dispatch(
+            chatApiSlice.util.updateQueryData(
+              "getMessages",
+              (message as { room: string }).room || "",
+              (draft) => {
+                messagesAdapter.removeOne(draft, optimisticMessage.id);
+              }
+            )
+          );
         }
+
         return { data: null };
       },
     }),

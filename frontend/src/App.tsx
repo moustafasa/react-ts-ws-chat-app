@@ -17,6 +17,7 @@ import MessageBox from "./features/chat/MessageBox/MessageBox";
 import { action as logoutAction } from "./features/auth/LogOut";
 import { useRefreshMutation } from "./features/auth/authApiSlice";
 import NotFound from "./components/not-found/NotFound";
+import { useCallback } from "react";
 
 const authBackLoader = (token: string) => async () => {
   if (token) {
@@ -24,18 +25,18 @@ const authBackLoader = (token: string) => async () => {
   }
   return null;
 };
-const protectLoader =
-  (token: string | undefined, isLoading: boolean) => async () => {
-    if (token || isLoading) {
+
+function App() {
+  const token = useAppSelector(getToken);
+  console.log(!!token, "fksd");
+  const [, { isLoading }] = useRefreshMutation();
+  const protectLoader = useCallback(async () => {
+    if (!!token || isLoading) {
       return null;
     } else {
       return redirect("/login");
     }
-  };
-
-function App() {
-  const token = useAppSelector(getToken);
-  const [, { isLoading }] = useRefreshMutation();
+  }, [isLoading, token]);
 
   const dispatch = useAppDispatch();
 
@@ -76,7 +77,7 @@ function App() {
                   ),
                 },
               ],
-              loader: protectLoader(token, !isLoading),
+              loader: protectLoader,
             },
             { path: "/logout", loader: logoutAction(dispatch) },
             { path: "/not-found", element: <NotFound /> },

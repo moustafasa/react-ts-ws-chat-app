@@ -65,7 +65,7 @@ const NavBar = () => {
                   onClick={() => {
                     logout();
                   }}
-                  className="nav-link"
+                  className="nav-link text-start text-capitalize"
                 >
                   logout
                 </button>

@@ -4,10 +4,10 @@ import sass from "./ChatListHeader.module.scss";
 import { Button, Form } from "react-bootstrap";
 import { RiUserAddFill } from "react-icons/ri";
 import { useCreateChatMutation } from "../../chatApiSlice";
-import { FaPlusCircle } from "react-icons/fa";
+import { FaUserPlus } from "react-icons/fa";
 
 const ChatListHeader = () => {
-  const [createChat, { error }] = useCreateChatMutation();
+  const [createChat, { error, isLoading }] = useCreateChatMutation();
   const [showForm, setShowForm] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
 
@@ -43,7 +43,15 @@ const ChatListHeader = () => {
             isInvalid={!!error}
           />
           <Button type="submit">
-            <FaPlusCircle />
+            {isLoading ? (
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            ) : (
+              <FaUserPlus />
+            )}
           </Button>
         </div>
         {error && (

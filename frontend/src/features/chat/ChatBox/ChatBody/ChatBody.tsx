@@ -9,6 +9,7 @@ import {
   useReadMessageMutation,
 } from "../../chatApiSlice";
 import sass from "./ChatBody.module.scss";
+import LoadingSpinner from "../../../../components/Spinner/LoadingSpinner";
 
 const ChatBody = () => {
   const { room } = useParams();
@@ -52,11 +53,13 @@ const ChatBody = () => {
         sass["chat-body"]
       }
     >
-      {messages.map((message) => (
-        <Fragment key={message.id}>
-          <Message key={message.id} message={message} />
-        </Fragment>
-      ))}
+      {isFetching && <LoadingSpinner showP />}
+      {!isFetching &&
+        messages.map((message) => (
+          <Fragment key={message.id}>
+            <Message key={message.id} message={message} />
+          </Fragment>
+        ))}
       <span ref={spanRef}></span>
     </div>
   );
