@@ -15,7 +15,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
           const res = await queryFulfilled;
           dispatch(setCredentials(res.data));
         } catch (err) {
-          console.log(err);
+          //console.log(err);
         }
       },
     }),
@@ -30,7 +30,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
           const res = await queryFulfilled;
           dispatch(setCredentials(res.data));
         } catch (err) {
-          console.log(err);
+          //console.log(err);
         }
       },
     }),
@@ -41,7 +41,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
           const res = await queryFulfilled;
           dispatch(setCredentials(res.data));
         } catch (err) {
-          console.log(err);
+          //console.log(err);
         }
       },
     }),
@@ -52,7 +52,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
           await queryFulfilled;
           dispatch(logout());
         } catch (err) {
-          console.log(err);
+          //console.log(err);
         }
       },
     }),

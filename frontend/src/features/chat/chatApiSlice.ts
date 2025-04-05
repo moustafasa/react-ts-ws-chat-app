@@ -139,7 +139,7 @@ export const chatApiSlice = apiSlice.injectEndpoints({
           };
           ws.addEventListener("message", onMessageListener);
         } catch (err) {
-          console.log(err);
+          //console.log(err);
           //it is handled by rtk query
         }
         await cacheEntryRemoved;

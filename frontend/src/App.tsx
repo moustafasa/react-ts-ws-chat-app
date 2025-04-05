@@ -28,7 +28,6 @@ const authBackLoader = (token: string) => async () => {
 
 function App() {
   const token = useAppSelector(getToken);
-  console.log(!!token, "fksd");
   const [, { isLoading }] = useRefreshMutation();
   const protectLoader = useCallback(async () => {
     if (!!token || isLoading) {
