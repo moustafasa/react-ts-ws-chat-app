@@ -1,6 +1,6 @@
 export const allowedHosts = [
   "http://localhost:5173",
-  "https://react-ts-ws-chat-app.vercel.app/",
+  "https://react-ts-ws-chat-app.vercel.app",
   // "https://react-ts-ws-chat-app-production.up.railway.app",
 ];
 // // Create a middleware function that checks the request origin
