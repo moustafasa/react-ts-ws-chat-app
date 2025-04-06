@@ -1,5 +1,4 @@
 import { authenticate } from "./controllers/authControllers.js";
-import jsonServer from "json-server";
 import cookieParser from "cookie-parser";
 import { WebSocketServer } from "ws";
 import { createServer } from "http";
@@ -24,23 +23,11 @@ import cors from "cors";
 configDotenv();
 const server = express();
 const app = createServer(server);
-const router = jsonServer.router("/db.json");
-const middlewares = jsonServer.defaults();
 const port = import.meta.PORT || 3000;
-const db = router.db;
+
 dbConnect();
 
-server.use(middlewares);
-// A middleware to hash the password before saving a new user
-server.use(jsonServer.bodyParser);
 server.use(cookieParser());
-server.use(
-  jsonServer.rewriter({
-    "data/users": "/users",
-    "data/chatRooms": "/chatRooms",
-    "data/messages": "/messages",
-  })
-);
 
 // Use the middleware function before the router
 server.use(
@@ -96,7 +83,6 @@ wss.on("connection", async (ws) => {
 
 app.on("upgrade", upgradeUrl(wss, authenticate));
 
-server.use(router);
 app.listen(
   port,
   setTimeout(() => {
