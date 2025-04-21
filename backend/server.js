@@ -29,14 +29,19 @@ dbConnect();
 
 server.use(cookieParser());
 
+// Parse JSON request bodies
+server.use(express.json());
+
 // Use the middleware function before the router
 server.use(
   cors({
     origin: (origin, callback) => {
       // Check if the origin is in the allowed hosts
       if (allowedHosts.indexOf(origin) !== -1 || !origin) {
-        callback(null, true);
+        console.log(origin);
+        callback(null, origin);
       } else {
+        console.log("error");
         callback(new Error("Not allowed by CORS"));
       }
     },
